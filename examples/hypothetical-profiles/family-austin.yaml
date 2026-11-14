@@ -41,6 +41,8 @@ weekend:
     time: '18:00'
   late_nights: false
   earliest_start: 08:00
+  bedtime: '19:00'
+  late_penalty: 3
 constraints:
   max_age_limit_ok: 0
   kid_friendly_only: true
@@ -153,11 +155,7 @@ evaluation:
     weight: 1
   - id: novelty
     weight: 1
-  hard_filters:
-  - field: start_hour
-    op: gte
-    value: 19
-    reason: after bedtime
+  hard_filters: []
   caps: []
   adjustments: []
 digest:

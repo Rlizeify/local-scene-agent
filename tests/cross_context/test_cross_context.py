@@ -71,11 +71,14 @@ def test_rural_long_drive_still_a_pick():
     assert r["minutes"] == 60 and r["verdict"] in ("top", "pick")
 
 
-def test_family_bedtime_filter():
+def test_family_bedtime_is_soft():
+    """Past the kids' bedtime still shows up (maybe grandma's babysitting), just ranked well down and flagged."""
     prof = profile.load(EXAMPLES / "family-austin.yaml")
-    r = evaluate(normalize({"title": "Family day concert in the park", "city": "Zilker", "start": "2026-11-14T19:30"}),
-                 prof, W.weekend_window(prof, SAT))
-    assert r["verdict"] == "excluded" and "after bedtime" in r["excluded_because"]
+    win = W.weekend_window(prof, SAT)
+    late = evaluate(normalize({"title": "Family day concert in the park", "city": "Zilker", "start": "2026-11-14T19:30"}), prof, win)
+    early = evaluate(normalize({"title": "Family day concert in the park", "city": "Zilker", "start": "2026-11-14T10:00"}), prof, win)
+    assert late["verdict"] != "excluded" and "bedtime" in late["heads_up"][0]
+    assert early["rule_score"] - late["rule_score"] >= 2.5
 
 
 def test_family_weekend_is_saturday_morning_to_sunday():

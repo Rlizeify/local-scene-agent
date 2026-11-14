@@ -302,6 +302,11 @@ def cmd_schedule(args):
     if args.action == "list":
         _out(TASKS); return
     user = paths.resolve_user(args.user)
+    if args.action == "routine":
+        from .schedule import routine_body
+        if not args.cron:
+            raise SystemExit("--cron is required, e.g. 'CRON_TZ=America/New_York 0 14 * * 5' (Fridays 2pm)")
+        _out(routine_body(args.task, user, args.cron, args.environment, args.model)); return
     print(render(args.task, user, args.target))
 
 
@@ -388,10 +393,13 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--force", action="store_true")
     s.set_defaults(fn=cmd_skill)
 
-    s = sub.add_parser("schedule", help="render <task> | list: prompts for scheduled tasks")
-    s.add_argument("action", choices=["render", "list"])
+    s = sub.add_parser("schedule", help="render <task> | routine <task> | list: prompts and routine bodies for scheduled runs")
+    s.add_argument("action", choices=["render", "routine", "list"])
     s.add_argument("task", nargs="?", default="weekend-digest")
     s.add_argument("--target", choices=["local", "cloud"], default="local")
+    s.add_argument("--cron", help="With routine: cron expression (CRON_TZ=<zone> prefix keeps it in local time)")
+    s.add_argument("--environment", help="With routine: cloud environment id")
+    s.add_argument("--model", default="claude-sonnet-5-5")
     s.set_defaults(fn=cmd_schedule)
     return p
 

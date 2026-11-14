@@ -241,12 +241,12 @@ def test_cli_digest_save_and_log(home, capsys, fixture_events, tmp_path):
     assert '"event": "digest"' in capsys.readouterr().out
 
 
-# ---- early birds: cutoff, daytime preference, blocked standing plans ----
+# ---- early birds: bedtime, daytime preference, standing-plan clashes (all soft) ----
 
 @pytest.fixture
 def early(maya):
-    maya["weekend"].update(latest_start="17:30", prefer_daytime=True, late_nights=False)
-    maya["anchors"] = [{"label": "Surfing", "day": "saturday", "start": "07:00", "end": "12:00", "blocks": True}]
+    maya["weekend"].update(bedtime="20:00", prefer_daytime=True, late_nights=False)
+    maya["anchors"] = [{"label": "Surfing", "day": "saturday", "start": "07:00", "end": "12:00"}]
     return maya
 
 
@@ -258,32 +258,60 @@ def test_parse_clock(text, expected):
     assert (t.hour, t.minute) == expected if expected else t is None
 
 
-def test_cutoff_excludes_late_starts(early):
-    r = _score(early, {"title": "jazz trio", "venue": "Yoshi's", "city": "Oakland", "start": "2026-11-14T19:00"})
-    assert r["verdict"] == "excluded" and "after your 5:30pm cutoff" in r["excluded_because"][0]
+def _jazz(start, end=None):
+    e = {"title": "jazz trio", "venue": "Yoshi's", "city": "Oakland", "start": start}
+    if end:
+        e["end"] = end
+    return e
 
 
-def test_blocked_anchor_excludes_clashes(early):
+def test_late_start_ranks_lower_with_heads_up_never_hidden(early):
+    early_show = _score(early, _jazz("2026-11-14T15:00", "2026-11-14T17:00"))
+    late_show = _score(early, _jazz("2026-11-14T20:30"))
+    assert late_show["verdict"] != "excluded" and not late_show["excluded_because"]
+    assert late_show["rule_score"] < early_show["rule_score"]
+    assert "past your 8pm bedtime" in late_show["heads_up"][0]
+
+
+def test_late_ending_gets_half_penalty(early):
+    ends_late = _score(early, _jazz("2026-11-14T18:00", "2026-11-14T21:30"))
+    starts_late = _score(early, _jazz("2026-11-14T19:30"))
+    assert "ends 9:30pm" in ends_late["heads_up"][0]
+    assert ends_late["rule_score"] > starts_late["rule_score"]
+
+
+def test_standing_plan_clash_is_flagged_not_blocked(early):
     clash = _score(early, {"title": "flea market", "city": "Oakland", "start": "2026-11-14T09:00", "free": True})
     after = _score(early, {"title": "flea market", "city": "Oakland", "start": "2026-11-14T13:00", "free": True})
     sunday = _score(early, {"title": "flea market", "city": "Oakland", "start": "2026-11-15T09:00", "free": True})
-    assert clash["verdict"] == "excluded" and "clashes with Surfing" in clash["excluded_because"]
-    assert after["verdict"] != "excluded" and sunday["verdict"] != "excluded"
+    assert clash["verdict"] != "excluded" and "during Surfing" in clash["heads_up"][0]
+    assert "leave early" in clash["heads_up"][0]
+    assert clash["rule_score"] < after["rule_score"] and not after["heads_up"] and not sunday["heads_up"]
+    starts_before = _score(early, {"title": "flea market", "city": "Oakland", "start": "2026-11-14T06:00",
+                                   "end": "2026-11-14T08:00", "free": True})
+    assert "overlaps the start of Surfing" in starts_before["heads_up"][0]
 
 
 def test_prefer_daytime_ranks_afternoon_over_evening(early):
-    day = _score(early, {"title": "jazz trio", "venue": "Yoshi's", "city": "Oakland", "start": "2026-11-15T14:00"})
-    eve = _score(early, {"title": "jazz trio", "venue": "Yoshi's", "city": "Oakland", "start": "2026-11-15T17:15"})
+    day = _score(early, _jazz("2026-11-15T14:00"))
+    eve = _score(early, _jazz("2026-11-15T17:15"))
     assert day["rule_score"] > eve["rule_score"]
 
 
-def test_recurring_respects_cutoff_and_blocks(early):
-    early["recurring"] = [{"name": "Night walk", "rule": "every friday", "time": "6-9pm"},
+def test_recurring_keeps_everything_and_flags(early):
+    early["recurring"] = [{"name": "Night walk", "rule": "every friday", "time": "8-10pm"},
                           {"name": "Morning market", "rule": "every saturday", "time": "9am"},
                           {"name": "Afternoon jam", "rule": "every sunday", "time": "16:00"},
                           {"name": "Untimed thing", "rule": "every sunday", "time": "evening"}]
-    names = [r["name"] for r in W.recurring_in_window(early, *W.weekend_window(early, SAT))]
-    assert names == ["Afternoon jam", "Untimed thing"]
+    rec = {r["name"]: r for r in W.recurring_in_window(early, *W.weekend_window(early, SAT))}
+    assert set(rec) == {"Night walk", "Morning market", "Afternoon jam", "Untimed thing"}
+    assert "bedtime" in rec["Night walk"]["heads_up"][0] and "Surfing" in rec["Morning market"]["heads_up"][0]
+    assert rec["Afternoon jam"]["heads_up"] == [] and rec["Untimed thing"]["heads_up"] == []
+
+
+def test_digest_shows_heads_up(early):
+    md = digest.build([_jazz("2026-11-14T20:30"), _jazz("2026-11-15T14:00")], early, SAT)["markdown"]
+    assert "heads-up: starts 8:30pm" in md
 
 
 # ---- source discovery ----

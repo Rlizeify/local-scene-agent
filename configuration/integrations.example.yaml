@@ -8,6 +8,16 @@ automation:
     calendar: none               # google | notion | outlook | none (clash checks; writes need approval)
     push: claude_app             # claude_app | none
     browser: built_in            # built_in | chrome | none
+  email_digest:                  # scheduled runs email you the full digest (your own inbox only)
+    enabled: true
+    to: self                     # uses user.email
+    subject_prefix: Weekend picks
+  calendar:                      # standing opt-in: picks go on your own calendar, marked free, no guests
+    auto_add: true
+    which: top                   # top | top_and_picks
+    title_prefix: "[Scene] "
+    only_verified: true
+    default_minutes: 120
   schedules:
     - task: weekend-digest       # weekend-digest | tonight | month-ahead | log-check
       when: "Fridays 2pm"

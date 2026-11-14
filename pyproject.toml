@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "local-scene-agent"
-version = "0.2.0"
+version = "0.3.0"
 description = "A self-configuring 'what should I do this weekend, where I live' agent for Claude: onboarding interview, taste profile, event scoring, digests, field notes and generated skills."
 readme = "README.md"
 license = {text = "MIT"}

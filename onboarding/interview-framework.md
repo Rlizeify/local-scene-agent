@@ -40,8 +40,9 @@ This is a map, not a script. Ask what this person needs, in this order, and skip
 ## C. Rhythm and limits
 **Must learn:**
 - Which nights count as "the weekend" (default Friday 5pm to Sunday night) and whether late nights (10pm+ starts) are normal for them
-- Bedtime and wake-up: anything starting after X is out (`weekend.latest_start`); do they prefer daytime (`prefer_daytime`)?
-- Blocked time: standing plans that eat a chunk of the weekend (Saturday 7–noon surfing) go in `anchors` with `start`, `end`, `blocks: true`
+- Bedtime and wake-up (`weekend.bedtime`), and whether they prefer daytime (`prefer_daytime`). Tell them later things still show up, ranked lower with a heads-up; nothing is hidden for time.
+- Standing plans that take a chunk of the weekend (Saturday 7–noon surfing) go in `anchors` with `start` and `end`. Clashing events are still shown, flagged ("you'd leave surfing early").
+- Themes they never want, that keywords won't catch (`avoid_themes`). Record the rule, not the reason.
 - Budget per ticket: comfortable, and a hard max if they have one; whether free stuff deserves a bump
 - Age limits they meet (21+? kids along?)
 - Who usually comes along: solo, partner, friends, family
@@ -83,6 +84,7 @@ This is a map, not a script. Ask what this person needs, in this order, and skip
 - Whether to show travel times
 - Whether they want it automated: which day/time, and where (see `docs/scheduled-tasks.md`): a local scheduled task (can use the full engine) or a cloud routine (runs even when the computer is off; uses an inline brief)
 - Notifications: always, only when there are picks, never
+- Email the full digest to themselves? Add picks to their calendar automatically (Top only or all picks)? If yes, get their email and switch on `automation.email_digest` / `automation.calendar`. Then build the routine for them (`workflows/scheduled-runs.md`).
 
 **Done when:** you could write the scheduled prompt.
 

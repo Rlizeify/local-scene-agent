@@ -69,6 +69,7 @@ def normalize(raw: dict, source: str | None = None) -> dict:
     if start:
         e["day"] = start.strftime("%A").lower()
         e["start_hour"] = start.hour if e["_has_time"] else None
+    e["_end"] = parse_start(e.get("end")) if has_time(e.get("end")) else None
     e["id"] = e.get("id") or event_key(e["title"], e.get("venue"), e.get("start"))
     return e
 

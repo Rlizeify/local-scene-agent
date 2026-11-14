@@ -193,7 +193,8 @@ def summary_markdown(prof: dict) -> str:
                f"{en.get('day', 'sunday').title()} {en.get('time', '23:59')}")
     out.append(f"- Late nights (10pm+ starts): {'yes' if wk.get('late_nights') else 'rarely'}"
                + (f"; nothing before {wk['earliest_start']}" if wk.get("earliest_start") else "")
-               + (f"; nothing starting after {wk['latest_start']}" if wk.get("latest_start") else ""))
+               + (f"; bedtime {wk['bedtime']} (later things rank lower and get a heads-up, never hidden)"
+                  if wk.get("bedtime") else ""))
     if wk.get("prefer_daytime"):
         out.append("- Prefers daytime: evening starts score lower")
     if u.get("goes_with"):
@@ -211,7 +212,8 @@ def summary_markdown(prof: dict) -> str:
     for a in prof.get("anchors", []):
         when = f" {a['start']}-{a['end']}" if a.get("start") and a.get("end") else (f" {a['time']}" if a.get("time") else "")
         out.append(f"- Standing plan: {a['label']}" + (f", {a['day'].title()}" if a.get("day") else "") + when
-                   + (f" at {a['where']}" if a.get("where") else "") + (" (time blocked)" if a.get("blocks") else ""))
+                   + (f" at {a['where']}" if a.get("where") else "")
+                   + (" (clashing events still shown, flagged and ranked a bit lower)" if a.get("start") and a.get("end") else ""))
     out.append("")
 
     if goals.get("summary") or goals.get("operating_rules"):
@@ -235,11 +237,8 @@ def summary_markdown(prof: dict) -> str:
     if cons.get("max_age_limit_ok") is not None:
         deal.append(f"age limit above {cons['max_age_limit_ok']}")
     deal.append("outside the weekend window")
-    if wk.get("latest_start"):
-        deal.append(f"starting after {wk['latest_start']}")
-    for a in prof.get("anchors", []):
-        if a.get("blocks") and a.get("start") and a.get("end"):
-            deal.append(f"clashing with {a['label']} ({a.get('day', '').title()} {a['start']}-{a['end']})")
+    for t in prof.get("avoid_themes", []):
+        deal.append(f"theme: {t} (judged by Claude, beyond keywords)")
     deal += [r.get("reason") or f"{r['field']} {r['op']} {r.get('value')}" for r in ev.get("hard_filters", [])]
     out += [f"  - {d}" for d in deal]
     ctotal = sum(c["weight"] for c in ev["criteria"])

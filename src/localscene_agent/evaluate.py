@@ -13,7 +13,7 @@ import datetime as dt
 import re
 
 from .events import fmt_day, fmt_time, norm_text
-from .window import blocked_by_anchor, latest_start
+from .window import time_heads_up
 
 
 def _has(text: str, phrase: str) -> bool:
@@ -262,13 +262,8 @@ def evaluate(ev: dict, prof: dict, window: tuple[dt.datetime, dt.datetime] | Non
         lo, hi = window
         if (day_only and not (lo.date() <= start.date() <= hi.date())) or (not day_only and not (lo <= start <= hi)):
             excluded.append(f"outside the window ({fmt_day(start)})")
-    if start and ev.get("_has_time"):
-        cutoff = latest_start(prof)
-        if cutoff and start.time() > cutoff:
-            excluded.append(f"starts {fmt_time(start)}, after your {fmt_time(dt.datetime.combine(start.date(), cutoff))} cutoff")
-        clash = blocked_by_anchor(prof, start)
-        if clash:
-            excluded.append(f"clashes with {clash['label']}")
+    # Time never excludes: late starts and standing-plan clashes lower the rank and come with a heads-up.
+    heads_up = time_heads_up(prof, start, ev.get("_end")) if start and ev.get("_has_time") else []
     for rule in prof["evaluation"].get("hard_filters", []):
         if rule_matches(rule, ev):
             excluded.append(_rule_text(rule))
@@ -298,6 +293,10 @@ def evaluate(ev: dict, prof: dict, window: tuple[dt.datetime, dt.datetime] | Non
         if rule_matches(adj, ev):
             raw += adj["points"]
             notes.append(f"{adj['points']:+g}: {_rule_text(adj)}")
+    for text, pen in heads_up:
+        if pen:
+            raw -= pen
+            notes.append(f"-{pen:g}: {text}")
     if not ctx["matches"] and raw > 4:
         raw = 4.0
         notes.append("capped at 4: matches none of your interests")
@@ -326,4 +325,5 @@ def evaluate(ev: dict, prof: dict, window: tuple[dt.datetime, dt.datetime] | Non
             "area": ctx["area"]["name"] if ctx["area"] else None,
             "minutes": ctx["area"]["minutes"] if ctx["area"] else None,
             "breakdown": breakdown, "adjustments_and_caps": notes, "unknowns": unknowns,
+            "heads_up": [t for t, _ in heads_up],
             "verified": bool(ev.get("verified"))}

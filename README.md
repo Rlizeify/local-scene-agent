@@ -6,9 +6,11 @@ A self-configuring "what should I do this weekend, where I live?" agent for Clau
 - look ahead at festivals and on-sale dates
 - remember where you went and how it was, so picks get better
 - find fresh local sources for wherever you live, or wherever you're visiting
-- run every Friday on a schedule
+- run every Friday on a schedule, email you the full digest, and put the top picks on your calendar
 
 It works anywhere and for anyone: a techno kid in Brooklyn, a family in Austin, a contra dancer in rural Vermont, a sober maker in Seattle. Nothing in the engine assumes a city, genre, venue, budget or bedtime. All of that lives in your profile.
+
+**Nothing is hidden for time.** A show past your bedtime or during your Saturday surf still shows up, ranked lower, with a heads-up. You decide.
 
 **It recommends; you act.** It never buys tickets, RSVPs, contacts anyone, edits your notes or shares your data without your explicit yes. It never invents lineups, times or prices. See [docs/safety.md](docs/safety.md).
 

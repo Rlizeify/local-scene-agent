@@ -8,11 +8,19 @@
 | `month-ahead` | Annual festivals, big shows and on-sale dates for the next 5 weeks | First of the month |
 | `log-check` | Lists last weekend's picks so you can record what you did | Monday morning |
 
-Render a prompt:
+Render a prompt, or a ready-to-create cloud routine:
 ```bash
 lsa --user <id> schedule render weekend-digest --target local
 lsa --user <id> schedule render weekend-digest --target cloud
+lsa --user <id> schedule routine weekend-digest --cron 'CRON_TZ=America/New_York 0 14 * * 5'
 ```
+`schedule routine` prints the body the routines tool needs (name, cron, prompt, model, tools) and lists the connectors to attach. The `/local-scene` skill fills in the environment and connectors and creates it, so nobody has to paste prompts by hand.
+
+## What a run delivers
+- **The digest**, ranked by your interests: Top picks, standing plans, one section per interest, recurring events, coming up, sources.
+- **An email with the whole digest** (optional, `automation.email_digest`): sent to your own inbox only. It opens with what was added to your calendar and "Want any of these on your calendar too?".
+- **Calendar entries** (optional, `automation.calendar`): Top picks (or all picks) added to your own calendar, marked free, no guests, no duplicates, labeled so you can delete what you skip.
+- **One push notification** (optional).
 
 ## Two targets, honestly compared
 | | `local`: Claude desktop app scheduled task | `cloud`: claude.ai routine |

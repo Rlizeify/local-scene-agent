@@ -59,6 +59,10 @@
             "mixed"
           ],
           "description": "Who usually comes along. Shapes suggestions (solo-friendly rooms, kid-friendly, etc.)."
+        },
+        "email": {
+          "type": "string",
+          "description": "Where the user's own digest email goes. Local only."
         }
       },
       "required": [
@@ -187,14 +191,20 @@
           "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
           "description": "Nothing before this time."
         },
-        "latest_start": {
-          "type": "string",
-          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
-          "description": "Nothing starting after this time (hard filter), e.g. an early bedtime."
-        },
         "prefer_daytime": {
           "type": "boolean",
           "description": "Daytime and early evening rank higher; evening starts score lower."
+        },
+        "bedtime": {
+          "type": "string",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+          "description": "Events starting near it or running past it rank lower and get a heads-up. Never hidden."
+        },
+        "late_penalty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Points off for past-bedtime starts (half for late endings). Default 1.5."
         }
       }
     },
@@ -466,15 +476,17 @@
           "start": {
             "type": "string",
             "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
-            "description": "With end and blocks: the blocked time."
+            "description": "With end: the usual time. Clashing events are still shown, flagged and ranked a bit lower."
           },
           "end": {
             "type": "string",
             "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
           },
-          "blocks": {
-            "type": "boolean",
-            "description": "Events starting inside start-end on this day are excluded."
+          "conflict_penalty": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 5,
+            "description": "Points off for clashing events. Default 0.5."
           }
         },
         "required": [
@@ -943,6 +955,9 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "routine_id": {
+                "type": "string"
               }
             },
             "required": [
@@ -997,6 +1012,56 @@
               ]
             }
           }
+        },
+        "email_digest": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "to": {
+              "type": "string",
+              "description": "'self' (user.email) or an address the user named. Only ever the user's own inbox."
+            },
+            "subject_prefix": {
+              "type": "string"
+            }
+          },
+          "description": "Scheduled runs email the full digest (not just 'task finished')."
+        },
+        "calendar": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "auto_add": {
+              "type": "boolean",
+              "description": "Standing approval to add picks to the user's own calendar."
+            },
+            "which": {
+              "enum": [
+                "top",
+                "top_and_picks"
+              ]
+            },
+            "calendar_id": {
+              "type": "string",
+              "description": "Default: primary"
+            },
+            "title_prefix": {
+              "type": "string"
+            },
+            "only_verified": {
+              "type": "boolean",
+              "description": "Only add events whose date and time were confirmed on their own page. Default true."
+            },
+            "default_minutes": {
+              "type": "integer",
+              "minimum": 15,
+              "description": "Length when no end time is listed. Default 120."
+            }
+          },
+          "description": "Auto-add picks to the user's calendar during scheduled runs (opt-in)."
         }
       }
     },
@@ -1040,6 +1105,13 @@
           "change"
         ]
       }
+    },
+    "avoid_themes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Themes to skip that keywords can't catch reliably (Claude judges these from the listing)."
     }
   }
 }

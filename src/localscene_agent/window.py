@@ -39,19 +39,53 @@ def parse_clock(s) -> dt.time | None:
     return dt.time(h, mi)
 
 
-def latest_start(prof: dict) -> dt.time | None:
-    return parse_clock(prof.get("weekend", {}).get("latest_start"))
+def bedtime(prof: dict) -> dt.time | None:
+    return parse_clock(prof.get("weekend", {}).get("bedtime"))
 
 
-def blocked_by_anchor(prof: dict, start: dt.datetime) -> dict | None:
-    """The standing plan whose blocked time covers this start, if any."""
+def _fmt(t: dt.time) -> str:
+    h = t.hour % 12 or 12
+    return f"{h}{'' if t.minute == 0 else f':{t.minute:02d}'}{'am' if t.hour < 12 else 'pm'}"
+
+
+def anchor_conflict(prof: dict, start: dt.datetime, end: dt.datetime | None = None) -> tuple[dict, str] | None:
+    """The standing plan this event overlaps, and how ('during' or 'overlaps the start of')."""
     for a in prof.get("anchors", []):
-        if not a.get("blocks") or not a.get("day") or DAYS.index(a["day"]) != start.weekday():
+        if not a.get("day") or DAYS.index(a["day"]) != start.weekday():
             continue
         lo, hi = parse_clock(a.get("start")), parse_clock(a.get("end"))
-        if lo and hi and lo <= start.time() < hi:
-            return a
+        if not (lo and hi):
+            continue
+        s = start.time()
+        e = end.time() if end and end.date() == start.date() else None
+        if lo <= s < hi:
+            return a, "during"
+        if e and s < lo < e:
+            return a, "overlaps the start of"
     return None
+
+
+def time_heads_up(prof: dict, start: dt.datetime, end: dt.datetime | None = None) -> list[tuple[str, float]]:
+    """Soft time notes as (text, score penalty). Time never hides an event; it lowers the rank and says why."""
+    out = []
+    wk = prof.get("weekend", {})
+    bt = bedtime(prof)
+    if bt:
+        pen = float(wk.get("late_penalty", 1.5))
+        bt_dt = dt.datetime.combine(start.date(), bt)
+        if start.hour < 5 or start >= bt_dt - dt.timedelta(minutes=60):
+            out.append((f"starts {_fmt(start.time())}, near or past your {_fmt(bt)} bedtime", pen))
+        elif end and (end > bt_dt or end.date() > start.date()):
+            out.append((f"ends {_fmt(end.time())}, past your {_fmt(bt)} bedtime", pen / 2))
+        elif not end and start >= bt_dt - dt.timedelta(minutes=150):
+            out.append((f"may run past your {_fmt(bt)} bedtime", pen / 2))
+    hit = anchor_conflict(prof, start, end)
+    if hit:
+        a, how = hit
+        when = f"{a['day'].title()[:3]} {a['start']}-{a['end']}"
+        tip = "you'd skip it or leave early" if how == "during" else "you'd start late"
+        out.append((f"{how} {a['label']} ({when}): {tip}", float(a.get("conflict_penalty", 0.5))))
+    return out
 
 
 def _hm(s: str, default: str) -> dt.time:
@@ -126,12 +160,9 @@ def recurring_in_window(prof: dict, start: dt.datetime, end: dt.datetime) -> lis
             if r.get("months") and d.month not in r["months"]:
                 continue
             if occurs_on(r["rule"], d):
-                t, cutoff = parse_clock(r.get("time")), latest_start(prof)
-                if t and cutoff and t > cutoff:
-                    continue  # starts after the user's cutoff
-                if t and blocked_by_anchor(prof, dt.datetime.combine(d, t)):
-                    continue
-                out.append({**r, "date": d.isoformat(), "day": DAYS[d.weekday()]})
+                t = parse_clock(r.get("time"))
+                notes = [n for n, _ in time_heads_up(prof, dt.datetime.combine(d, t))] if t else []
+                out.append({**r, "date": d.isoformat(), "day": DAYS[d.weekday()], "heads_up": notes})
         d += dt.timedelta(days=1)
     return out
 

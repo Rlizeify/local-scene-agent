@@ -100,3 +100,38 @@ def test_schedule_prompts(home):
     assert "Friday 17:00 to Sunday 22:00" in cloud  # the profile's own weekend, not a hardcoded one
     for task in schedule.TASKS:
         assert schedule.render(task, uid, "local") and schedule.render(task, uid, "cloud")
+
+
+def _with_automation(uid, **auto):
+    p = profile.load(paths.profile_path(uid))
+    p["user"]["email"] = "maya@example.com"
+    p["avoid_themes"] = ["anything built around a cause or campaign"]
+    p["automation"].update(auto)
+    profile.save(p, paths.profile_path(uid))
+    assert profile.validate(p) == []
+
+
+def test_email_and_calendar_blocks_only_when_switched_on(home):
+    uid = install_profile(EXAMPLE_PROFILE)
+    off = schedule.render("weekend-digest", uid, "cloud")
+    assert "EMAIL" not in off and "CALENDAR" not in off
+    _with_automation(uid, email_digest={"enabled": True, "to": "self"},
+                     calendar={"auto_add": True, "which": "top", "title_prefix": "[Scene] "})
+    on = schedule.render("weekend-digest", uid, "cloud")
+    assert "Send ONE email to maya@example.com only" in on and "full digest itself" in on
+    assert "Added to your calendar" in on and "Want any of these on your calendar too?" in on
+    assert "[Scene] <event> @ <venue>" in on and "no duplicates" in on and "No guests" in on
+    assert "cause or campaign" in on  # avoid_themes reach the brief
+    assert "Time never removes an event" in on
+
+
+def test_routine_body_is_ready_to_create(home):
+    uid = install_profile(EXAMPLE_PROFILE)
+    _with_automation(uid, email_digest={"enabled": True}, calendar={"auto_add": True})
+    body = schedule.routine_body("weekend-digest", uid, "CRON_TZ=America/Los_Angeles 0 14 * * 5", "env_x")
+    ccr = body["job_config"]["ccr"]
+    assert body["cron_expression"].endswith("0 14 * * 5") and ccr["environment_id"] == "env_x"
+    msg = ccr["events"][0]["data"]["message"]
+    assert msg["role"] == "user" and "EMAIL" in msg["content"] and "lsa.py" not in msg["content"]
+    assert set(body["_attach_connectors"]) == {"Gmail", "Google Calendar"}
+    assert "WebSearch" in ccr["session_context"]["allowed_tools"]

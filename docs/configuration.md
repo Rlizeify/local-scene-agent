@@ -65,16 +65,35 @@ Excluded places, venues marked `closed`, top-level `avoid_keywords`, age limit a
 ### Built-in bonuses
 +0.5 for recurring events when `goals.prefer_recurring`; +0.3 for free events when `budget.free_bonus`. Events matching none of your interests are capped at 4.
 
-## Time limits
+## Time: ranked, never hidden
+Nobody wants a great show hidden because it starts late or lands on their surf morning. They want to know, and decide. So time only ever **lowers the rank and adds a heads-up**:
 ```yaml
 weekend:
-  latest_start: "17:30"      # nothing starting after this (hard filter), e.g. an early bedtime
-  prefer_daytime: true       # daytime ranks higher; evening starts score lower
-  earliest_start: "06:00"    # nothing before this
+  bedtime: "20:00"          # starts within an hour of it (or after): -late_penalty; ends after it: -half
+  late_penalty: 1.5         # default 1.5
+  prefer_daytime: true      # evening starts score lower on timing
+  earliest_start: "06:00"   # earlier starts score lower on timing
 anchors:
-  - {label: Surfing, day: saturday, start: "07:00", end: "12:00", blocks: true}   # clashing events excluded
+  - {label: Surfing, day: saturday, start: "07:00", end: "12:00", conflict_penalty: 0.5}
 ```
-Recurring events with a parseable `time` ("9am", "6-9pm", "18:00") are hidden when they start after the cutoff or inside a blocked plan.
+The digest says why: "heads-up: starts 8:30pm, near or past your 8pm bedtime", "heads-up: during Surfing (Sat 07:00-12:00): you'd skip it or leave early". Recurring events get the same heads-ups.
+
+## Themes to skip
+`avoid_keywords` excludes on words. `avoid_themes` covers what words miss; Claude judges it from what the listing is about:
+```yaml
+avoid_themes:
+  - political events or overtly political acts
+```
+
+## Email and calendar (scheduled runs)
+```yaml
+user:
+  email: you@example.com         # local only
+automation:
+  email_digest: {enabled: true, to: self, subject_prefix: Weekend picks}
+  calendar: {auto_add: true, which: top, title_prefix: "[Scene] ", only_verified: true, default_minutes: 120}
+```
+Standing opt-ins: the digest email goes only to your own inbox; calendar entries go only on your own calendar, marked free, no guests, no duplicates.
 
 ## Calendar pieces
 - `anchors`: standing weekly plans (always shown).

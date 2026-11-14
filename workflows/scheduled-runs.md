@@ -20,11 +20,15 @@ Tasks: `weekend-digest`, `tonight`, `month-ahead`, `log-check`.
 | Notion / push | if connected | if connected to the routine |
 | After profile changes | nothing to do | **re-render and update the routine** |
 
-## Setting one up
-1. Render the prompt with the target the user wants.
-2. Show it, and agree a time (Friday early afternoon is a good default for a weekend digest).
-3. Create the task with the scheduled-task tool (local) or the routines tool (cloud), if this session has them. Otherwise give them the prompt and the steps.
-4. Record it in the profile: `automation.schedules[]` with `task`, `when`, `target`.
+## Setting one up (do it for them; don't make them paste prompts)
+1. **Agree what it delivers.** Ask once: email the full digest to themselves? Add picks to their calendar automatically (Top only, or all picks)? Push notification? Switch those on in the profile (`automation.email_digest`, `automation.calendar`, `integrations.push`) and record their email in `user.email`. These are standing opt-ins they're giving you; say so plainly.
+2. **Agree a time.** Friday early afternoon is a good default. Use a `CRON_TZ=<their timezone>` prefix so it stays in local time across daylight saving.
+3. **Cloud routine (runs with the computer off):**
+   - `lsa schedule routine weekend-digest --cron '<cron>'` prints the create body and the connectors it needs (`_attach_connectors`: Notion for their guide, Gmail for the email, Google Calendar for auto-add).
+   - Get the environment id and the connectors' `connector_uuid`/`name`/`url` from the routines tool (an existing routine's `mcp_connections`, or the connector list). Add them to `mcp_connections`, add each connector's tools to `allowed_tools` (e.g. `mcp__Gmail__*`), drop the `_` keys, then create it.
+   - If a needed connector isn't connected, tell them where to connect it rather than creating a routine that will fail.
+4. **Local scheduled task (computer on):** create it with the scheduled-task tool using `lsa schedule render weekend-digest --target local`.
+5. **Record it** in `automation.schedules[]` (`task`, `when`, `target`, `routine_id`) and offer one test run now, so they see the email and calendar entries before Friday.
 
 ## Rules baked into every prompt
-Read/research/report only: no tickets, RSVPs, messages, sign-ups, guide edits or personal data. Verify dates; label unverified items; don't retry refused fetches; say when a tool is missing.
+Read/research/report only: no tickets, RSVPs, messages to anyone, sign-ups, guide edits or personal data. The only exceptions are the user's own digest email and their own calendar, and only when they switched those on. Time never removes an event. Verify dates; label unverified items; don't retry refused fetches; say when a tool is missing.

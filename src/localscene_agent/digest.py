@@ -39,6 +39,8 @@ def _line(e: dict, r: dict, prof: dict) -> str:
         bits.append(f"~{r['minutes']:g} min")
     if not e.get("verified"):
         bits.append("(unverified)")
+    for h in r.get("heads_up", []):
+        bits.append(f"heads-up: {h}")
     return " · ".join(bits) + (f" — {e['url']}" if e.get("url") else "")
 
 
@@ -105,7 +107,8 @@ def build(raw_events: list[dict], prof: dict, today: dt.date | None = None, win=
             md.append("## Recurring this weekend")
             for r in rec:
                 md.append(f"- {r['day'].title()[:3]}{' ' + r['time'] if r.get('time') else ''} · {r['name']}"
-                          + (f" · {r['where']}" if r.get("where") else "") + (f" · {r['price']}" if r.get("price") else ""))
+                          + (f" · {r['where']}" if r.get("where") else "") + (f" · {r['price']}" if r.get("price") else "")
+                          + "".join(f" · heads-up: {h}" for h in r.get("heads_up", [])))
             md.append("")
 
     if dg.get("include_coming_up", True):

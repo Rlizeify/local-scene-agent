@@ -2,6 +2,14 @@
 
 All notable changes are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## 0.3.0 (2026-11-14)
+- **Time is never a filter.** `weekend.latest_start` is replaced by `weekend.bedtime` (+ `late_penalty`): late starts and late endings rank lower with a heads-up. Standing plans with `start`/`end` flag clashes ("during Surfing: you'd leave early") and cost `conflict_penalty` (default 0.5) instead of hiding events; `anchors[].blocks` is removed. Recurring events carry heads-ups instead of disappearing. Migration: rename `latest_start` to `bedtime` and drop `blocks`.
+- **`avoid_themes`:** themes to skip that keywords can't catch, judged by Claude and carried into scheduled prompts.
+- **Email digest** (`automation.email_digest`): scheduled runs email the full digest to the user's own inbox, opening with what was added to the calendar and what else they might want there.
+- **Calendar auto-add** (`automation.calendar`): opt-in standing approval to add Top picks (or all picks) to the user's own calendar, marked free, no guests, deduplicated, verified times only by default.
+- **Routine builder:** `lsa schedule routine <task> --cron ...` prints a ready-to-create cloud routine body with the connectors it needs; the skill creates it, no pasting.
+- Events accept an `end` time. 103 tests.
+
 ## 0.2.0 (2026-11-14)
 - **Source discovery** (`lsa sources discover [--place ...]`, `workflows/source-discovery.md`): a categorized search plan built from any place and the user's ranked interests (alt-weekly, tourism board, parks/libraries, college and community radio, DIY spaces, community threads, multi-city platforms, per-interest). Vetting rules, access modes, and a freshness loop. Onboarding uses it when a user has no guide; the skill uses it for moves and trips.
 - **Early birds and busy mornings:** `weekend.latest_start` (hard cutoff), `weekend.prefer_daytime` (evening starts score lower), and blocking standing plans (`anchors[].start/end/blocks`) that exclude clashing events. Recurring events respect both.

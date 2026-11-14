@@ -23,6 +23,10 @@ Schema: `{{ENGINE_ROOT}}/schemas/user-profile.schema.json`. Annotated example: `
 | Calendars / aggregators | `sources[]`: `access` fetch / search / browser / app; `priority` 1 (always) – 3 (if time) |
 | Their own guide (Notion/Doc) | `knowledge_base[]` with `type`, `ref` (page id or URL), `use_for` |
 | Late nights fine | `weekend.late_nights: true` |
+| "In bed by 8" | `weekend.bedtime: "20:00"` (soft: later things rank lower with a heads-up) |
+| "Saturdays 7–noon I surf" | `anchors[]` with `day`, `start`, `end` (soft: clashes flagged, not hidden) |
+| "Nothing political" (a theme, not a word) | `avoid_themes[]` |
+| "Email me the list" / "put picks on my calendar" | `user.email`, `automation.email_digest`, `automation.calendar` |
 | Budget | `budget.comfortable_max`, `budget.hard_max` (hard filter), `free_bonus` |
 | 21+ ok / kids along | `constraints.max_age_limit_ok: 21` / `0` + `kid_friendly_only: true` |
 | Rules of thumb | `goals.operating_rules[]` (Claude applies these in judgement) |
