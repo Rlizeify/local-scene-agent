@@ -5,6 +5,7 @@ A self-configuring "what should I do this weekend, where I live?" agent for Clau
 - tell you whether a specific show, flyer or listing is worth it
 - look ahead at festivals and on-sale dates
 - remember where you went and how it was, so picks get better
+- find fresh local sources for wherever you live, or wherever you're visiting
 - run every Friday on a schedule
 
 It works anywhere and for anyone: a techno kid in Brooklyn, a family in Austin, a contra dancer in rural Vermont, a sober maker in Seattle. Nothing in the engine assumes a city, genre, venue, budget or bedtime. All of that lives in your profile.
@@ -19,6 +20,7 @@ It works anywhere and for anyone: a techno kid in Brooklyn, a family in Austin, 
                          lsa engine (window · recurring · plan · evaluate · digest · log · schedule)
 ```
 - **Layer 1, core engine:** a small Python CLI (`lsa`) plus workflow playbooks. It works out the weekend window, places your recurring events on the calendar, builds a research plan from your top interests, scores every candidate with explanations, dedupes, writes the digest and push line, keeps a log of what you went to, and renders scheduled-task prompts. It doesn't scrape; Claude does the reading with whatever tools it has.
+- **Fresh sources anywhere:** no calendars are hardcoded. Every town has the same *kinds* of sources (alt-weekly, tourism board, parks and libraries, college and community radio, DIY spaces, the subreddit's weekend thread, multi-city platforms like Bandsintown and RA, venue calendars), so `lsa sources discover` builds a search plan for your place and interests, Claude vets each candidate for current dated listings, and you pick which to keep. See [workflows/source-discovery.md](workflows/source-discovery.md).
 - **Layer 2, your configuration:** one schema-validated YAML profile: ranked interests (keywords, favorite rooms, artists), your map with travel times, no-go places, budget, age limits, standing plans, recurring and annual events, sources, your own scene guide (Notion/Doc, read-only), rules of thumb, digest style. Versioned, with re-approval.
 - **Layer 3, execution:** a personal skill generated from a generic template. It holds *paths only* and reads your live profile every run, so on-demand use and scheduled runs share one engine.
 
@@ -74,13 +76,13 @@ Details: [installation](docs/installation.md) · [configuration](docs/configurat
 ## Repository layout
 ```
 lsa.py                    run the engine without installing (skills call this)
-src/localscene_agent/     engine: profile, window, events, evaluate, research, digest, log,
-                          schedule, skillgen, cli
+src/localscene_agent/     engine: profile, window, events, evaluate, research, sources, digest,
+                          log, schedule, skillgen, cli
 schemas/                  user-profile, event and log-row JSON Schemas
 onboarding/               the onboarding skill: SKILL.md, interview framework, profile mapping
 skills/local-scene/       generic personal-skill template (SKILL.md.tmpl)
-workflows/                playbooks: research, evaluation, digest, tonight, plan-ahead,
-                          field notes, venue upkeep, scheduled runs, profile updates
+workflows/                playbooks: research, source discovery, evaluation, digest, tonight,
+                          plan-ahead, field notes, venue upkeep, scheduled runs, profile updates
 configuration/            annotated example profile and integrations config
 examples/                 six hypothetical users in very different places and lives
 tests/                    engine, onboarding, profile validation, cross-context, privacy

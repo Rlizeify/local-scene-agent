@@ -40,6 +40,8 @@ This is a map, not a script. Ask what this person needs, in this order, and skip
 ## C. Rhythm and limits
 **Must learn:**
 - Which nights count as "the weekend" (default Friday 5pm to Sunday night) and whether late nights (10pm+ starts) are normal for them
+- Bedtime and wake-up: anything starting after X is out (`weekend.latest_start`); do they prefer daytime (`prefer_daytime`)?
+- Blocked time: standing plans that eat a chunk of the weekend (Saturday 7–noon surfing) go in `anchors` with `start`, `end`, `blocks: true`
 - Budget per ticket: comfortable, and a hard max if they have one; whether free stuff deserves a bump
 - Age limits they meet (21+? kids along?)
 - Who usually comes along: solo, partner, friends, family
@@ -70,7 +72,7 @@ This is a map, not a script. Ask what this person needs, in this order, and skip
 - Anything that's closed or questionable in their lists
 
 **Ask if relevant:**
-- **No sources:** search the area yourself ("<city> events calendar", "<city> <genre> listings", local alt-weekly, tourism board, ticketing platforms popular there) and propose 6–12 sources ranked P1–P3. Mark sites that need a browser or block bots as `access: search`.
+- **No sources, or only a few:** run source discovery (`lsa sources discover`, `workflows/source-discovery.md`). It searches the kinds of sources every town has (alt-weekly, tourism board, parks/libraries, college and community radio, DIY spaces, the subreddit's weekend thread, multi-city platforms) plus each interest, keeps only sources with current dated listings, and proposes 6–12 ranked P1–P3. Mark sites that block bots as `access: search`.
 - **App-only sources** (Instagram, Bandsintown, ticketing apps): record as `access: app` so the digest can remind them to check.
 
 **Done when:** at least one source per top interest.

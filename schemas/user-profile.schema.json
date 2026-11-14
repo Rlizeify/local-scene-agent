@@ -186,6 +186,15 @@
           "type": "string",
           "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
           "description": "Nothing before this time."
+        },
+        "latest_start": {
+          "type": "string",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+          "description": "Nothing starting after this time (hard filter), e.g. an early bedtime."
+        },
+        "prefer_daytime": {
+          "type": "boolean",
+          "description": "Daytime and early evening rank higher; evening starts score lower."
         }
       }
     },
@@ -397,6 +406,22 @@
           },
           "enabled": {
             "type": "boolean"
+          },
+          "notes": {
+            "type": "string",
+            "description": "What worked or failed last time (refused fetches, stale calendar)."
+          },
+          "last_ok": {
+            "type": "string",
+            "description": "Date the source last returned current listings."
+          },
+          "found_by": {
+            "enum": [
+              "user",
+              "guide",
+              "discovery"
+            ],
+            "description": "Where the source came from."
           }
         },
         "required": [
@@ -437,6 +462,19 @@
           },
           "notes": {
             "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+            "description": "With end and blocks: the blocked time."
+          },
+          "end": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+          },
+          "blocks": {
+            "type": "boolean",
+            "description": "Events starting inside start-end on this day are excluded."
           }
         },
         "required": [

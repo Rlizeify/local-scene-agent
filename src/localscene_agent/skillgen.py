@@ -18,7 +18,7 @@ from . import __version__, paths, profile as profile_mod
 TEMPLATE = paths.SKILLS_DIR / "local-scene" / "SKILL.md.tmpl"
 ONBOARDING_SRC = paths.ENGINE_ROOT / "onboarding"
 REFERENCE_FILES = ["research.md", "evaluation.md", "digest.md", "tonight.md", "plan-ahead.md",
-                   "field-notes.md", "venue-upkeep.md", "scheduled-runs.md", "profile-updates.md"]
+                   "field-notes.md", "venue-upkeep.md", "source-discovery.md", "scheduled-runs.md", "profile-updates.md"]
 MANIFEST = "lsa-skill.json"
 
 

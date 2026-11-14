@@ -192,7 +192,10 @@ def summary_markdown(prof: dict) -> str:
     out.append(f"- \"The weekend\" runs {st.get('day', 'friday').title()} {st.get('time', '17:00')} to "
                f"{en.get('day', 'sunday').title()} {en.get('time', '23:59')}")
     out.append(f"- Late nights (10pm+ starts): {'yes' if wk.get('late_nights') else 'rarely'}"
-               + (f"; nothing before {wk['earliest_start']}" if wk.get("earliest_start") else ""))
+               + (f"; nothing before {wk['earliest_start']}" if wk.get("earliest_start") else "")
+               + (f"; nothing starting after {wk['latest_start']}" if wk.get("latest_start") else ""))
+    if wk.get("prefer_daytime"):
+        out.append("- Prefers daytime: evening starts score lower")
     if u.get("goes_with"):
         out.append(f"- Usually goes: {u['goes_with']}")
     if cons.get("max_age_limit_ok") is not None:
@@ -206,8 +209,9 @@ def summary_markdown(prof: dict) -> str:
         out.append(f"- Budget per ticket: comfortable up to {cur} {bud.get('comfortable_max') or '?'}"
                    + (f", never over {cur} {bud['hard_max']}" if bud.get("hard_max") else ""))
     for a in prof.get("anchors", []):
-        out.append(f"- Standing plan: {a['label']}" + (f", {a['day'].title()}" if a.get("day") else "")
-                   + (f" {a['time']}" if a.get("time") else "") + (f" at {a['where']}" if a.get("where") else ""))
+        when = f" {a['start']}-{a['end']}" if a.get("start") and a.get("end") else (f" {a['time']}" if a.get("time") else "")
+        out.append(f"- Standing plan: {a['label']}" + (f", {a['day'].title()}" if a.get("day") else "") + when
+                   + (f" at {a['where']}" if a.get("where") else "") + (" (time blocked)" if a.get("blocks") else ""))
     out.append("")
 
     if goals.get("summary") or goals.get("operating_rules"):
@@ -231,6 +235,11 @@ def summary_markdown(prof: dict) -> str:
     if cons.get("max_age_limit_ok") is not None:
         deal.append(f"age limit above {cons['max_age_limit_ok']}")
     deal.append("outside the weekend window")
+    if wk.get("latest_start"):
+        deal.append(f"starting after {wk['latest_start']}")
+    for a in prof.get("anchors", []):
+        if a.get("blocks") and a.get("start") and a.get("end"):
+            deal.append(f"clashing with {a['label']} ({a.get('day', '').title()} {a['start']}-{a['end']})")
     deal += [r.get("reason") or f"{r['field']} {r['op']} {r.get('value')}" for r in ev.get("hard_filters", [])]
     out += [f"  - {d}" for d in deal]
     ctotal = sum(c["weight"] for c in ev["criteria"])

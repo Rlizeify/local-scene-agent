@@ -13,6 +13,7 @@ import datetime as dt
 import re
 
 from .events import fmt_day, fmt_time, norm_text
+from .window import blocked_by_anchor, latest_start
 
 
 def _has(text: str, phrase: str) -> bool:
@@ -196,6 +197,10 @@ def c_timing(ev, prof, ctx):
             return 0.2, f"starts {fmt_time(start)}, earlier than you like"
     if (h >= 22 or h < 5) and not wk.get("late_nights"):
         return 0.3, f"late start ({fmt_time(start)})"
+    if wk.get("prefer_daytime") and h >= 17:
+        return 0.6, f"evening ({start:%a} {fmt_time(start)}); you prefer daytime"
+    if wk.get("prefer_daytime"):
+        return 1.0, f"daytime ({start:%a} {fmt_time(start)})"
     return 1.0, f"{start:%a} {fmt_time(start)}"
 
 
@@ -257,6 +262,13 @@ def evaluate(ev: dict, prof: dict, window: tuple[dt.datetime, dt.datetime] | Non
         lo, hi = window
         if (day_only and not (lo.date() <= start.date() <= hi.date())) or (not day_only and not (lo <= start <= hi)):
             excluded.append(f"outside the window ({fmt_day(start)})")
+    if start and ev.get("_has_time"):
+        cutoff = latest_start(prof)
+        if cutoff and start.time() > cutoff:
+            excluded.append(f"starts {fmt_time(start)}, after your {fmt_time(dt.datetime.combine(start.date(), cutoff))} cutoff")
+        clash = blocked_by_anchor(prof, start)
+        if clash:
+            excluded.append(f"clashes with {clash['label']}")
     for rule in prof["evaluation"].get("hard_filters", []):
         if rule_matches(rule, ev):
             excluded.append(_rule_text(rule))

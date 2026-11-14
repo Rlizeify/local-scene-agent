@@ -251,6 +251,19 @@ def cmd_log(args):
                       f"{r.get('rating') or '-':>2}  {r['title']} @ {r.get('venue', '')}")
 
 
+def cmd_sources(args):
+    from .sources import discover, discover_markdown
+    user = paths.resolve_user(args.user)
+    prof = _load_profile(user)
+    if args.action == "list":
+        _out(prof["sources"]); return
+    d = discover(prof, args.place)
+    if args.json:
+        _out(d)
+    else:
+        print(discover_markdown(d))
+
+
 def cmd_insights(args):
     from .log import insights
     user = paths.resolve_user(args.user)
@@ -356,6 +369,12 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--set", action="append", help="column=value (repeatable)")
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_log)
+
+    s = sub.add_parser("sources", help="discover | list: find fresh event sources for your place (or --place for a trip)")
+    s.add_argument("action", choices=["discover", "list"])
+    s.add_argument("--place", help="Somewhere other than your home base, e.g. 'Eugene, OR'")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(fn=cmd_sources)
 
     sub.add_parser("insights", help="What your log says about your taste, with suggested profile changes").set_defaults(fn=cmd_insights)
 

@@ -239,3 +239,61 @@ def test_cli_digest_save_and_log(home, capsys, fixture_events, tmp_path):
     assert len(EventLog(paths.log_path(uid)).rows) == len(rows)  # re-running adds nothing
     run_cli("--user", uid, "history")
     assert '"event": "digest"' in capsys.readouterr().out
+
+
+# ---- early birds: cutoff, daytime preference, blocked standing plans ----
+
+@pytest.fixture
+def early(maya):
+    maya["weekend"].update(latest_start="17:30", prefer_daytime=True, late_nights=False)
+    maya["anchors"] = [{"label": "Surfing", "day": "saturday", "start": "07:00", "end": "12:00", "blocks": True}]
+    return maya
+
+
+@pytest.mark.parametrize("text,expected", [
+    ("18:00", (18, 0)), ("6-9pm", (18, 0)), ("7am", (7, 0)), ("5-10pm", (17, 0)), ("12pm", (12, 0)),
+    ("10:30 pm", (22, 30)), ("evening", None), ("", None)])
+def test_parse_clock(text, expected):
+    t = W.parse_clock(text)
+    assert (t.hour, t.minute) == expected if expected else t is None
+
+
+def test_cutoff_excludes_late_starts(early):
+    r = _score(early, {"title": "jazz trio", "venue": "Yoshi's", "city": "Oakland", "start": "2026-11-14T19:00"})
+    assert r["verdict"] == "excluded" and "after your 5:30pm cutoff" in r["excluded_because"][0]
+
+
+def test_blocked_anchor_excludes_clashes(early):
+    clash = _score(early, {"title": "flea market", "city": "Oakland", "start": "2026-11-14T09:00", "free": True})
+    after = _score(early, {"title": "flea market", "city": "Oakland", "start": "2026-11-14T13:00", "free": True})
+    sunday = _score(early, {"title": "flea market", "city": "Oakland", "start": "2026-11-15T09:00", "free": True})
+    assert clash["verdict"] == "excluded" and "clashes with Surfing" in clash["excluded_because"]
+    assert after["verdict"] != "excluded" and sunday["verdict"] != "excluded"
+
+
+def test_prefer_daytime_ranks_afternoon_over_evening(early):
+    day = _score(early, {"title": "jazz trio", "venue": "Yoshi's", "city": "Oakland", "start": "2026-11-15T14:00"})
+    eve = _score(early, {"title": "jazz trio", "venue": "Yoshi's", "city": "Oakland", "start": "2026-11-15T17:15"})
+    assert day["rule_score"] > eve["rule_score"]
+
+
+def test_recurring_respects_cutoff_and_blocks(early):
+    early["recurring"] = [{"name": "Night walk", "rule": "every friday", "time": "6-9pm"},
+                          {"name": "Morning market", "rule": "every saturday", "time": "9am"},
+                          {"name": "Afternoon jam", "rule": "every sunday", "time": "16:00"},
+                          {"name": "Untimed thing", "rule": "every sunday", "time": "evening"}]
+    names = [r["name"] for r in W.recurring_in_window(early, *W.weekend_window(early, SAT))]
+    assert names == ["Afternoon jam", "Untimed thing"]
+
+
+# ---- source discovery ----
+
+def test_source_discovery_is_place_agnostic(maya):
+    from localscene_agent.sources import CATEGORIES, discover
+    d = discover(maya, "Eugene, OR")
+    cats = [c["category"] for c in d["plan"]]
+    assert [c for c, *_ in CATEGORIES] == cats[:len(CATEGORIES)]
+    assert cats[len(CATEGORIES)] == "interest:jazz"  # interests follow, in rank order
+    flat = " ".join(q for c in d["plan"] for q in c["searches"])
+    assert "Eugene" in flat and "Temescal" not in flat
+    assert "Temescal" in " ".join(q for c in discover(maya)["plan"] for q in c["searches"])

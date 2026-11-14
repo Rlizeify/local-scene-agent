@@ -65,6 +65,17 @@ Excluded places, venues marked `closed`, top-level `avoid_keywords`, age limit a
 ### Built-in bonuses
 +0.5 for recurring events when `goals.prefer_recurring`; +0.3 for free events when `budget.free_bonus`. Events matching none of your interests are capped at 4.
 
+## Time limits
+```yaml
+weekend:
+  latest_start: "17:30"      # nothing starting after this (hard filter), e.g. an early bedtime
+  prefer_daytime: true       # daytime ranks higher; evening starts score lower
+  earliest_start: "06:00"    # nothing before this
+anchors:
+  - {label: Surfing, day: saturday, start: "07:00", end: "12:00", blocks: true}   # clashing events excluded
+```
+Recurring events with a parseable `time` ("9am", "6-9pm", "18:00") are hidden when they start after the cutoff or inside a blocked plan.
+
 ## Calendar pieces
 - `anchors`: standing weekly plans (always shown).
 - `recurring`: `rule` is `every <day>`, `first|second|third|fourth|last <day>` (or 1st/2nd/3rd/4th), optional `months` for seasonal ones.
@@ -78,4 +89,6 @@ sources:
 knowledge_base:
   - {type: notion, ref: <page id>, title: My scene guide, use_for: [venues, sources]}
 ```
+Finding sources for a new place (or a trip): `lsa sources discover [--place 'Eugene, OR']`, see [workflows/source-discovery.md](../workflows/source-discovery.md).
+
 `access`: `fetch` (readable page), `search` (blocks bots / JS-only), `browser`, `app` (you check it; the digest reminds you). The knowledge base is read each run and **never edited** without your yes.

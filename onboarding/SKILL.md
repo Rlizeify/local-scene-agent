@@ -36,7 +36,7 @@ In 3–5 sentences:
 - **Extract everything you can:** home area, venues (with closed/verify notes), sources/aggregators, recurring events, annual events, standing weekly plans, walk-in fallbacks, rules of thumb, genres and artists.
 - **Tell them what you got** in a compact summary ("From your guide: 40 venues in 4 areas, 26 calendars, 6 recurring nights, 13 annual festivals, 6 rules of thumb"). **Only ask about what's missing or unclear.**
 
-No material? Fine. Collect it conversationally in step 3, and seed sources by searching for the area's best event calendars yourself (show them the list to confirm).
+No material? Fine. Collect it conversationally in step 3. Then find sources for their place with `lsa --user <id> sources discover` and `{{ENGINE_ROOT}}/workflows/source-discovery.md` (run it once the interests are known, since the plan is built from them). Show them the vetted list to confirm.
 
 ## Step 3: Interview in groups
 Follow `interview-framework.md`.

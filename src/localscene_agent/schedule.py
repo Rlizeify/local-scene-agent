@@ -49,6 +49,13 @@ def brief(prof: dict) -> str:
         lines.append(f"- Never over {bud.get('currency', 'USD')} {bud['hard_max']} a ticket"
                      + (f"; comfortable under {bud['comfortable_max']}" if bud.get("comfortable_max") else "") + ".")
     lines.append(f"- Late nights: {'yes' if wk.get('late_nights') else 'rarely'}.")
+    if wk.get("latest_start"):
+        lines.append(f"- HARD RULE: nothing starting after {wk['latest_start']}.")
+    if wk.get("prefer_daytime"):
+        lines.append("- Prefers daytime and early evening; rank those higher.")
+    for a in prof.get("anchors", []):
+        if a.get("blocks") and a.get("start") and a.get("end"):
+            lines.append(f"- BLOCKED: {a.get('day', '').title()} {a['start']}-{a['end']} ({a['label']}). Nothing then.")
     lines += ["", "WHAT THEY LIKE (rank picks against this, highest first)"]
     for n, i in enumerate(profile_mod.ranked_interests(prof), 1):
         s = f"{n}. {i['label']}: {', '.join(i['keywords'][:10])}"

@@ -14,6 +14,46 @@ ORDINALS = {"first": 1, "1st": 1, "second": 2, "2nd": 2, "third": 3, "3rd": 3, "
             "fifth": 5, "5th": 5, "last": -1}
 
 
+CLOCK_RX = re.compile(r"^\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?", re.I)
+
+
+def parse_clock(s) -> dt.time | None:
+    """First clock time in a free-text string: '18:00' -> 18:00, '6-9pm' -> 18:00, '7am' -> 07:00, 'evening' -> None."""
+    if not s:
+        return None
+    text = str(s).strip().lower()
+    m = CLOCK_RX.match(text)
+    if not m:
+        return None
+    h, mi = int(m.group(1)), int(m.group(2) or 0)
+    ampm = m.group(3)
+    if not ampm:  # '6-9pm': borrow the meridiem from the end of a range
+        tail = re.search(r"(am|pm)\b", text)
+        ampm = tail.group(1) if tail and not m.group(2) else None
+    if ampm == "pm" and h < 12:
+        h += 12
+    if ampm == "am" and h == 12:
+        h = 0
+    if h > 23 or mi > 59:
+        return None
+    return dt.time(h, mi)
+
+
+def latest_start(prof: dict) -> dt.time | None:
+    return parse_clock(prof.get("weekend", {}).get("latest_start"))
+
+
+def blocked_by_anchor(prof: dict, start: dt.datetime) -> dict | None:
+    """The standing plan whose blocked time covers this start, if any."""
+    for a in prof.get("anchors", []):
+        if not a.get("blocks") or not a.get("day") or DAYS.index(a["day"]) != start.weekday():
+            continue
+        lo, hi = parse_clock(a.get("start")), parse_clock(a.get("end"))
+        if lo and hi and lo <= start.time() < hi:
+            return a
+    return None
+
+
 def _hm(s: str, default: str) -> dt.time:
     h, m = (s or default).split(":")
     return dt.time(int(h), int(m))
@@ -86,6 +126,11 @@ def recurring_in_window(prof: dict, start: dt.datetime, end: dt.datetime) -> lis
             if r.get("months") and d.month not in r["months"]:
                 continue
             if occurs_on(r["rule"], d):
+                t, cutoff = parse_clock(r.get("time")), latest_start(prof)
+                if t and cutoff and t > cutoff:
+                    continue  # starts after the user's cutoff
+                if t and blocked_by_anchor(prof, dt.datetime.combine(d, t)):
+                    continue
                 out.append({**r, "date": d.isoformat(), "day": DAYS[d.weekday()]})
         d += dt.timedelta(days=1)
     return out
