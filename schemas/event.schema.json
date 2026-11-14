@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Normalized event",
+  "type": "object",
+  "required": [
+    "title"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "venue": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "start": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Local ISO datetime, e.g. 2026-11-14T22:00. A bare date if the time is unknown."
+    },
+    "end": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "price_min": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "price_max": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "price_text": {
+      "type": "string"
+    },
+    "free": {
+      "type": "boolean"
+    },
+    "age_limit": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "interests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Interest ids Claude assigned, if any."
+    },
+    "url": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "verified": {
+      "type": "boolean",
+      "description": "True only if Claude opened the event's own page (venue, promoter or ticketing) and saw this date."
+    },
+    "description": {
+      "type": "string"
+    },
+    "recurring": {
+      "type": "boolean"
+    },
+    "extra": {
+      "type": "object"
+    }
+  }
+}

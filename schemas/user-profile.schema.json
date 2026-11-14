@@ -1,0 +1,1007 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "local-scene-agent/user-profile.schema.json",
+  "title": "Local Scene Agent user profile",
+  "description": "One person's taste, home base, rhythm and rules. Written by the onboarding interview; editable by hand.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "profile_status",
+    "user",
+    "home",
+    "interests",
+    "evaluation",
+    "sources",
+    "permissions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "profile_status": {
+      "enum": [
+        "draft",
+        "approved"
+      ]
+    },
+    "approved_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "user": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,31}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preferred_name": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "IANA name, e.g. America/Chicago"
+        },
+        "goes_with": {
+          "enum": [
+            "solo",
+            "partner",
+            "friends",
+            "family",
+            "mixed"
+          ],
+          "description": "Who usually comes along. Shapes suggestions (solo-friendly rooms, kid-friendly, etc.)."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "home": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "base": {
+          "type": "string",
+          "description": "Neighborhood or town label. Never a street address."
+        },
+        "transport": {
+          "enum": [
+            "car",
+            "transit",
+            "bike",
+            "walk",
+            "rideshare",
+            "mixed"
+          ]
+        },
+        "max_drive_minutes": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Beyond this, events score 0 on distance (not excluded)."
+        },
+        "areas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "places": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1
+              },
+              "minutes": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Typical one-way travel time from home."
+              }
+            },
+            "required": [
+              "name",
+              "places",
+              "minutes"
+            ]
+          },
+          "minItems": 1
+        },
+        "excluded_places": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Never suggest anything here (hard filter)."
+        }
+      },
+      "required": [
+        "base",
+        "areas"
+      ]
+    },
+    "weekend": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "starts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "day": {
+              "enum": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ]
+            },
+            "time": {
+              "type": "string",
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+            }
+          }
+        },
+        "ends": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "day": {
+              "enum": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ]
+            },
+            "time": {
+              "type": "string",
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+            }
+          }
+        },
+        "late_nights": {
+          "type": "boolean",
+          "description": "Happy to start things at 10pm or later."
+        },
+        "earliest_start": {
+          "type": "string",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+          "description": "Nothing before this time."
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_age_limit_ok": {
+          "type": "integer",
+          "description": "Highest venue age limit the group meets: 21 for adults, 18, or 0 if kids come along."
+        },
+        "kid_friendly_only": {
+          "type": "boolean"
+        },
+        "alcohol_free_preferred": {
+          "type": "boolean"
+        },
+        "accessibility": {
+          "type": "string"
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "comfortable_max": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "hard_max": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Over this per ticket = excluded."
+        },
+        "free_bonus": {
+          "type": "boolean"
+        }
+      }
+    },
+    "interests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9_-]*$"
+          },
+          "label": {
+            "type": "string"
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 10
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Favorite rooms/places for this interest."
+          },
+          "artists": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "promoters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "avoid_keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "daytime": {
+            "type": "boolean",
+            "description": "Mostly a daytime thing (markets, surf, hikes)."
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "weight",
+          "keywords"
+        ]
+      },
+      "description": "What they're into, ranked by weight (higher = more important). Each one becomes a digest section.",
+      "minItems": 1
+    },
+    "avoid_keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Never suggest events mentioning these (hard filter)."
+    },
+    "venues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "city": {
+            "type": "string"
+          },
+          "area": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "enum": [
+              "active",
+              "verify",
+              "closed"
+            ]
+          },
+          "walk_in": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "description": "Their personal venue directory."
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "covers": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "access": {
+            "enum": [
+              "fetch",
+              "search",
+              "browser",
+              "app"
+            ],
+            "description": "fetch = readable page; search = use web search; browser = needs a real browser; app = the user checks it themselves."
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "description": "Calendars, aggregators and venue pages to check.",
+      "minItems": 1
+    },
+    "anchors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "day": {
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ]
+          },
+          "time": {
+            "type": "string"
+          },
+          "where": {
+            "type": "string"
+          },
+          "cadence": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "label"
+        ]
+      },
+      "description": "Standing weekly plans that always show up in the digest."
+    },
+    "recurring": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "rule": {
+            "type": "string",
+            "description": "'every saturday', 'first friday', '3rd saturday', 'last saturday', 'second sunday'."
+          },
+          "time": {
+            "type": "string"
+          },
+          "where": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "price": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "months": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            },
+            "description": "Only runs in these months (seasonal)."
+          }
+        },
+        "required": [
+          "name",
+          "rule"
+        ]
+      },
+      "description": "Recurring events the engine places on the calendar."
+    },
+    "annual": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "months": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            }
+          },
+          "where": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "url": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "months"
+        ]
+      }
+    },
+    "fallbacks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "where": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "description": "Walk-in, no-plan options for empty weekends."
+    },
+    "goals": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "operating_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Their own rules of thumb Claude applies when judging."
+        },
+        "prefer_recurring": {
+          "type": "boolean",
+          "description": "Favor things that repeat, to build familiarity and meet regulars."
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pick_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "top_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "weight": {
+                "type": "number",
+                "minimum": 0
+              },
+              "description": {
+                "type": "string"
+              },
+              "positive_signals": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "negative_signals": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "weight"
+            ]
+          },
+          "minItems": 1
+        },
+        "hard_filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "field",
+              "op"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "type": "string",
+                "description": "Event field (title, venue, city, price_min, age_limit, start_hour, day, description, tags, or any key in event.extra)."
+              },
+              "op": {
+                "enum": [
+                  "contains_any",
+                  "not_contains_any",
+                  "equals",
+                  "in",
+                  "not_in",
+                  "lt",
+                  "lte",
+                  "gt",
+                  "gte",
+                  "missing"
+                ]
+              },
+              "value": {},
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "caps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "type": "string",
+                "description": "Event field (title, venue, city, price_min, age_limit, start_hour, day, description, tags, or any key in event.extra)."
+              },
+              "op": {
+                "enum": [
+                  "contains_any",
+                  "not_contains_any",
+                  "equals",
+                  "in",
+                  "not_in",
+                  "lt",
+                  "lte",
+                  "gt",
+                  "gte",
+                  "missing"
+                ]
+              },
+              "value": {},
+              "reason": {
+                "type": "string"
+              },
+              "max_score": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "field",
+              "op",
+              "max_score"
+            ]
+          }
+        },
+        "adjustments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "type": "string",
+                "description": "Event field (title, venue, city, price_min, age_limit, start_hour, day, description, tags, or any key in event.extra)."
+              },
+              "op": {
+                "enum": [
+                  "contains_any",
+                  "not_contains_any",
+                  "equals",
+                  "in",
+                  "not_in",
+                  "lt",
+                  "lte",
+                  "gt",
+                  "gte",
+                  "missing"
+                ]
+              },
+              "value": {},
+              "reason": {
+                "type": "string"
+              },
+              "points": {
+                "type": "number",
+                "minimum": -5,
+                "maximum": 5
+              }
+            },
+            "required": [
+              "field",
+              "op",
+              "points"
+            ]
+          }
+        }
+      },
+      "required": [
+        "criteria"
+      ]
+    },
+    "digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "top_n": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "max_lines": {
+          "type": "integer",
+          "minimum": 10
+        },
+        "include_anchors": {
+          "type": "boolean"
+        },
+        "include_recurring": {
+          "type": "boolean"
+        },
+        "include_fallbacks": {
+          "type": "boolean"
+        },
+        "include_coming_up": {
+          "type": "boolean"
+        },
+        "show_travel_times": {
+          "type": "boolean"
+        },
+        "push_prefix": {
+          "type": "string"
+        },
+        "style": {
+          "type": "string",
+          "description": "Tone/format notes, e.g. 'phone-scannable, no fluff'."
+        }
+      }
+    },
+    "knowledge_base": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "enum": [
+              "notion",
+              "url",
+              "file",
+              "google_doc"
+            ]
+          },
+          "ref": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "use_for": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "ref"
+        ]
+      },
+      "description": "The user's own scene guide(s): read for venues and taste, never edited without approval."
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "may_use_browser": {
+          "type": "boolean"
+        },
+        "may_read_calendar": {
+          "type": "boolean"
+        },
+        "require_approval": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "allOf": [
+            {
+              "contains": {
+                "const": "buy_tickets"
+              }
+            },
+            {
+              "contains": {
+                "const": "rsvp"
+              }
+            },
+            {
+              "contains": {
+                "const": "contact_person"
+              }
+            },
+            {
+              "contains": {
+                "const": "share_personal_data"
+              }
+            },
+            {
+              "contains": {
+                "const": "edit_knowledge_base"
+              }
+            },
+            {
+              "contains": {
+                "const": "make_commitment"
+              }
+            }
+          ],
+          "description": "Locked: these always need the user's explicit yes."
+        }
+      },
+      "required": [
+        "require_approval"
+      ]
+    },
+    "automation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schedules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "task": {
+                "enum": [
+                  "weekend-digest",
+                  "tonight",
+                  "month-ahead",
+                  "log-check"
+                ]
+              },
+              "when": {
+                "type": "string"
+              },
+              "target": {
+                "enum": [
+                  "local",
+                  "cloud"
+                ]
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "task"
+            ]
+          }
+        },
+        "notify": {
+          "enum": [
+            "always",
+            "only_on_picks",
+            "never"
+          ]
+        },
+        "integrations": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "knowledge_base": {
+              "enum": [
+                "notion",
+                "google_docs",
+                "none"
+              ]
+            },
+            "email": {
+              "enum": [
+                "gmail",
+                "outlook",
+                "none"
+              ]
+            },
+            "calendar": {
+              "enum": [
+                "google",
+                "notion",
+                "outlook",
+                "none"
+              ]
+            },
+            "push": {
+              "enum": [
+                "claude_app",
+                "none"
+              ]
+            },
+            "browser": {
+              "enum": [
+                "built_in",
+                "chrome",
+                "none"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "blocking": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "field",
+          "note"
+        ]
+      }
+    },
+    "changelog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "change": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "change"
+        ]
+      }
+    }
+  }
+}

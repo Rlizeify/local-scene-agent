@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Log row (log.csv)",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "date_added": {
+      "type": "string"
+    },
+    "event_date": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "venue": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "interest": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "rule_score": {
+      "type": "string"
+    },
+    "fit_score": {
+      "type": "string"
+    },
+    "why": {
+      "type": "string"
+    },
+    "verified": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "suggested",
+        "interested",
+        "going",
+        "went",
+        "skipped",
+        "missed",
+        "cancelled"
+      ]
+    },
+    "status_date": {
+      "type": "string"
+    },
+    "rating": {
+      "enum": [
+        "",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    "return": {
+      "enum": [
+        "",
+        "yes",
+        "no",
+        "maybe"
+      ]
+    },
+    "people_met": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

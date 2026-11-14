@@ -1,0 +1,183 @@
+# Hypothetical profile: outdoors-denver. A fictional person, for tests and as a worked example.
+schema_version: 1
+profile_status: approved
+approved_at: '2026-01-15T10:00:00'
+user:
+  id: sam
+  name: Sam Whitaker
+  timezone: America/Denver
+home:
+  base: Highlands, Denver
+  transport: car
+  max_drive_minutes: 90
+  areas:
+  - name: Home
+    places:
+    - Highlands
+    - LoHi
+    - Sunnyside
+    minutes: 10
+  - name: Denver
+    places:
+    - RiNo
+    - Downtown
+    - Denver
+    - Englewood
+    minutes: 20
+  - name: Front Range
+    places:
+    - Golden
+    - Boulder
+    - Morrison
+    minutes: 35
+  - name: Mountains
+    places:
+    - Idaho Springs
+    - Evergreen
+    - Breckenridge
+    minutes: 80
+weekend:
+  starts:
+    day: friday
+    time: '16:00'
+  ends:
+    day: sunday
+    time: '20:00'
+  late_nights: false
+  earliest_start: 06:00
+constraints:
+  max_age_limit_ok: 21
+budget:
+  currency: USD
+  comfortable_max: 30
+  hard_max: 80
+  free_bonus: true
+interests:
+- id: climbing
+  label: Climbing
+  weight: 5
+  daytime: true
+  keywords:
+  - climbing
+  - bouldering
+  - crag
+  - comp
+  - climbing film
+  - route setting
+  venues:
+  - Movement RiNo
+- id: trail
+  label: Trail runs & hikes
+  weight: 4
+  daytime: true
+  keywords:
+  - trail run
+  - group hike
+  - trail race
+  - fourteener
+  - hiking club
+- id: bluegrass
+  label: Bluegrass & roots
+  weight: 3
+  keywords:
+  - bluegrass
+  - americana
+  - folk
+  - string band
+  - roots
+- id: beer
+  label: Brewery events
+  weight: 1
+  keywords:
+  - brewery
+  - tap takeover
+  - beer release
+avoid_keywords: []
+venues: []
+sources:
+- name: Gym event calendars
+  access: fetch
+  priority: 1
+  interests:
+  - climbing
+- name: Running club calendars
+  access: fetch
+  priority: 1
+  interests:
+  - trail
+- name: Venue calendars (roots music)
+  access: search
+  priority: 2
+  interests:
+  - bluegrass
+anchors:
+- label: Saturday trail run
+  day: saturday
+  time: 07:00
+  where: Golden
+recurring: []
+annual:
+- name: Bluegrass festival
+  months:
+  - 6
+  where: Front Range
+  interests:
+  - bluegrass
+fallbacks: []
+goals:
+  summary: Outside by day, low-key by night.
+  operating_rules:
+  - Nothing that ends after 11pm on Fridays
+  prefer_recurring: false
+evaluation:
+  pick_threshold: 6
+  top_threshold: 8
+  criteria:
+  - id: interest
+    weight: 4
+  - id: distance
+    weight: 2
+  - id: venue
+    weight: 1
+  - id: price
+    weight: 1
+  - id: timing
+    weight: 1
+  - id: novelty
+    weight: 1
+  hard_filters: []
+  caps: []
+  adjustments: []
+digest:
+  top_n: 3
+  max_lines: 40
+  include_anchors: true
+  include_recurring: true
+  include_fallbacks: true
+  include_coming_up: true
+  show_travel_times: true
+  push_prefix: 'Weekend picks:'
+knowledge_base: []
+permissions:
+  may_use_browser: true
+  may_read_calendar: false
+  require_approval:
+  - buy_tickets
+  - rsvp
+  - contact_person
+  - share_personal_data
+  - edit_knowledge_base
+  - make_commitment
+automation:
+  schedules: []
+  notify: only_on_picks
+  integrations:
+    knowledge_base: none
+    email: none
+    calendar: none
+    push: none
+    browser: none
+gaps: []
+changelog:
+- date: '2026-01-15'
+  change: Profile created and approved

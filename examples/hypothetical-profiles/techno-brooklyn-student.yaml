@@ -1,0 +1,167 @@
+# Hypothetical profile: techno-brooklyn-student. A fictional person, for tests and as a worked example.
+schema_version: 1
+profile_status: approved
+approved_at: '2026-01-15T10:00:00'
+user:
+  id: lex
+  name: Lex Moreno
+  timezone: America/New_York
+home:
+  base: Bushwick, Brooklyn
+  transport: transit
+  max_drive_minutes: 50
+  areas:
+  - name: Home
+    places:
+    - Bushwick
+    - Ridgewood
+    - East Williamsburg
+    minutes: 10
+  - name: Brooklyn
+    places:
+    - Williamsburg
+    - Greenpoint
+    - Gowanus
+    - Brooklyn
+    minutes: 25
+  - name: Manhattan
+    places:
+    - Lower East Side
+    - Manhattan
+    - Chelsea
+    minutes: 40
+  - name: Queens
+    places:
+    - Long Island City
+    - Astoria
+    - Queens
+    minutes: 40
+weekend:
+  starts:
+    day: thursday
+    time: '20:00'
+  ends:
+    day: sunday
+    time: '23:59'
+  late_nights: true
+constraints:
+  max_age_limit_ok: 21
+budget:
+  currency: USD
+  comfortable_max: 25
+  hard_max: 45
+  free_bonus: true
+interests:
+- id: techno
+  label: Techno & house
+  weight: 5
+  keywords:
+  - techno
+  - hard techno
+  - house
+  - acid
+  - electro
+  - warehouse
+  - rave
+  - dj set
+  avoid_keywords:
+  - edm
+  - bottle
+  artists: []
+  promoters: []
+- id: art
+  label: Gallery openings
+  weight: 3
+  keywords:
+  - opening reception
+  - gallery
+  - exhibition
+- id: film
+  label: Cheap cinema
+  weight: 2
+  keywords:
+  - screening
+  - film
+  - cinema
+  - 35mm
+avoid_keywords:
+- bottle service
+- vip table
+venues: []
+sources:
+- name: Resident Advisor (city page)
+  access: search
+  priority: 1
+  interests:
+  - techno
+- name: Ticketing app listings
+  access: app
+  priority: 2
+  interests:
+  - techno
+- name: Gallery openings list
+  access: fetch
+  priority: 2
+  interests:
+  - art
+anchors: []
+recurring: []
+annual: []
+fallbacks: []
+goals:
+  summary: Student budget; wants to find the good small rooms.
+  operating_rules:
+  - Small rooms over big rooms
+  prefer_recurring: false
+evaluation:
+  pick_threshold: 6
+  top_threshold: 8
+  criteria:
+  - id: interest
+    weight: 4
+  - id: price
+    weight: 2
+  - id: distance
+    weight: 1
+  - id: venue
+    weight: 1
+  - id: timing
+    weight: 1
+  - id: novelty
+    weight: 2
+  hard_filters: []
+  caps: []
+  adjustments: []
+digest:
+  top_n: 3
+  max_lines: 40
+  include_anchors: true
+  include_recurring: true
+  include_fallbacks: true
+  include_coming_up: true
+  show_travel_times: true
+  push_prefix: 'Weekend picks:'
+knowledge_base: []
+permissions:
+  may_use_browser: true
+  may_read_calendar: false
+  require_approval:
+  - buy_tickets
+  - rsvp
+  - contact_person
+  - share_personal_data
+  - edit_knowledge_base
+  - make_commitment
+automation:
+  schedules: []
+  notify: only_on_picks
+  integrations:
+    knowledge_base: none
+    email: none
+    calendar: none
+    push: none
+    browser: none
+gaps: []
+changelog:
+- date: '2026-01-15'
+  change: Profile created and approved

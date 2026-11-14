@@ -1,0 +1,144 @@
+# Annotated example profile. A fictional person; copy and edit, or let /local-scene-setup write yours.
+# Schema: schemas/user-profile.schema.json. Validate with: lsa --user <id> profile validate
+schema_version: 1
+profile_status: draft            # becomes "approved" only after the user says so (lsa profile approve)
+approved_at: null
+
+user:
+  id: maya                       # short lowercase id; names the data folder and the skill
+  name: Maya Okafor
+  preferred_name: Maya
+  timezone: America/Los_Angeles
+  goes_with: solo                # solo | partner | friends | family | mixed
+
+home:
+  base: Temescal, Oakland        # a neighborhood or town, never a street address
+  transport: mixed               # car | transit | bike | walk | rideshare | mixed
+  max_drive_minutes: 50          # farther still shows, but scores 0 on distance
+  areas:                         # the map: where she goes and how long it takes
+    - {name: Home, places: [Temescal, Rockridge, North Oakland, Emeryville], minutes: 10}
+    - {name: Oakland, places: [Downtown Oakland, Uptown, Jack London, Fruitvale, Oakland], minutes: 20}
+    - {name: Berkeley, places: [Berkeley, Albany], minutes: 20}
+    - {name: San Francisco, places: [San Francisco, Mission, SoMa, Tenderloin], minutes: 40}
+  excluded_places: []            # never suggest anything here (hard filter)
+
+weekend:
+  starts: {day: friday, time: "17:00"}
+  ends: {day: sunday, time: "22:00"}
+  late_nights: true              # 10pm+ starts are normal for her
+
+constraints:
+  max_age_limit_ok: 21           # 21 = adult; 0 = kids come along
+
+budget:
+  currency: USD
+  comfortable_max: 30
+  hard_max: 75                   # cheapest ticket over this = excluded
+  free_bonus: true               # +0.3 for free events
+
+interests:                       # ranked by weight; each becomes a digest section
+  - id: jazz
+    label: Live jazz
+    weight: 5
+    keywords: [jazz, bebop, hard bop, big band, vocal jazz, jam session, quartet, trio]
+    venues: [Yoshi's, Black Cat, SFJAZZ Center]
+    artists: []
+  - id: punk
+    label: Punk & DIY shows
+    weight: 4
+    keywords: [punk, hardcore, garage, post-punk, diy, all ages show]
+    venues: [924 Gilman, Eli's Mile High Club, Thee Parkside]
+    avoid_keywords: [tribute]    # cancels just this interest's match
+  - id: markets
+    label: Markets & makers
+    weight: 3
+    keywords: [flea market, makers market, night market, craft fair, vintage market, zine fest]
+    daytime: true
+  - id: film
+    label: Repertory film
+    weight: 2
+    keywords: [35mm, repertory, double feature, film series, retrospective, screening]
+    venues: [The New Parkway, Roxie Theater]
+
+avoid_keywords: [bottle service, pub crawl]   # excludes the event entirely
+
+venues:                          # her directory; area must be one of home.areas
+  - {name: Yoshi's, city: Oakland, area: Oakland, interests: [jazz], status: active}
+  - {name: Black Cat, city: San Francisco, area: San Francisco, interests: [jazz], status: active}
+  - {name: SFJAZZ Center, city: San Francisco, area: San Francisco, interests: [jazz], status: active}
+  - {name: 924 Gilman, city: Berkeley, area: Berkeley, interests: [punk], status: active}
+  - {name: Eli's Mile High Club, city: Oakland, area: Home, interests: [punk], status: verify, notes: "heard it changed owners"}
+  - {name: The New Parkway, city: Oakland, area: Oakland, interests: [film], status: active}
+  - {name: Old Warehouse Bar, city: Oakland, area: Oakland, status: closed, notes: "closed last spring"}
+
+sources:                         # access: fetch | search | browser | app ; priority 1 (always) .. 3 (if time)
+  - {name: "Venue calendars (Yoshi's, SFJAZZ)", covers: jazz, interests: [jazz], access: fetch, priority: 1}
+  - {name: The List (punk/DIY listings), covers: Bay Area shows, interests: [punk], access: fetch, priority: 1}
+  - {name: Local alt-weekly events, covers: everything, access: search, priority: 2}
+  - {name: Instagram (venues she follows), access: app, priority: 3}
+
+anchors:                         # standing plans shown every weekend
+  - {label: Saturday morning run club, day: saturday, time: "08:00", where: Lake Merritt}
+
+recurring:                       # the engine places these on the calendar
+  - {name: First Friday art walk, rule: first friday, time: "17:00", where: Uptown, city: Oakland, interests: [markets]}
+  - {name: Sunday jazz jam, rule: every sunday, time: "16:00", where: a bar in Temescal, interests: [jazz]}
+
+annual:
+  - {name: Zine fest, months: [8], where: Oakland, interests: [markets]}
+  - {name: Jazz festival weekend, months: [6], where: San Francisco, interests: [jazz]}
+
+fallbacks:                       # no-plan, walk-in options
+  - {name: Record store dig + coffee, where: Telegraph Ave}
+
+goals:
+  summary: New-ish to the area; wants a couple of regular spots where people know her.
+  prefer_recurring: true         # +0.5 to recurring events
+  operating_rules:
+    - Small rooms over big ones.
+    - One late night per weekend, max.
+
+evaluation:
+  pick_threshold: 6
+  top_threshold: 8
+  criteria:
+    - {id: interest, weight: 4}
+    - {id: distance, weight: 2}
+    - {id: venue, weight: 1}
+    - {id: price, weight: 1}
+    - {id: timing, weight: 1}
+    - {id: novelty, weight: 1}
+  hard_filters: []
+  caps:
+    - {field: price_min, op: gt, value: 50, max_score: 7, reason: "pricey, never a top pick"}
+  adjustments: []
+
+digest:
+  top_n: 3
+  max_lines: 40
+  include_anchors: true
+  include_recurring: true
+  include_fallbacks: true
+  include_coming_up: true
+  show_travel_times: true
+  push_prefix: "Weekend picks:"
+  style: phone-scannable, no fluff
+
+knowledge_base: []               # e.g. [{type: notion, ref: <page id>, title: "My scene guide", use_for: [venues, sources]}]
+
+permissions:
+  may_use_browser: true
+  may_read_calendar: false
+  require_approval: [buy_tickets, rsvp, contact_person, share_personal_data, edit_knowledge_base, make_commitment]
+
+automation:
+  schedules:
+    - {task: weekend-digest, when: "Fridays 2pm", target: local, enabled: false}
+  notify: only_on_picks
+  integrations: {knowledge_base: none, email: none, calendar: none, push: claude_app, browser: built_in}
+
+gaps:
+  - {field: interests.punk.artists, note: "No bands named yet", blocking: false}
+
+changelog:
+  - {date: "2026-01-10", change: Profile created}

@@ -1,0 +1,168 @@
+# Hypothetical profile: rural-vermont. A fictional person, for tests and as a worked example.
+schema_version: 1
+profile_status: approved
+approved_at: '2026-01-15T10:00:00'
+user:
+  id: ruth
+  name: Ruth Abernathy
+  timezone: America/New_York
+  goes_with: partner
+home:
+  base: small town, central Vermont
+  transport: car
+  max_drive_minutes: 75
+  areas:
+  - name: Town
+    places:
+    - Town Hall
+    - Village Green
+    minutes: 5
+  - name: Nearby towns
+    places:
+    - Montpelier
+    - Waterbury
+    - Stowe
+    minutes: 30
+  - name: Burlington
+    places:
+    - Burlington
+    - Winooski
+    minutes: 60
+weekend:
+  starts:
+    day: friday
+    time: '17:00'
+  ends:
+    day: sunday
+    time: '20:00'
+  late_nights: false
+constraints:
+  max_age_limit_ok: 21
+budget:
+  currency: USD
+  comfortable_max: 30
+  hard_max: 80
+  free_bonus: true
+interests:
+- id: dance
+  label: Contra & folk dance
+  weight: 5
+  keywords:
+  - contra dance
+  - contra
+  - square dance
+  - folk dance
+  - barn dance
+- id: food
+  label: Suppers & markets
+  weight: 4
+  daytime: true
+  keywords:
+  - church supper
+  - farmers market
+  - harvest
+  - maple
+  - potluck
+  - pie
+- id: theater
+  label: Community theater
+  weight: 3
+  keywords:
+  - theater
+  - theatre
+  - play
+  - musical
+- id: talks
+  label: Talks & library events
+  weight: 2
+  keywords:
+  - lecture
+  - author talk
+  - library
+  - historical society
+avoid_keywords: []
+venues: []
+sources:
+- name: Front Porch Forum-style town lists
+  access: app
+  priority: 1
+- name: Regional events calendar
+  access: fetch
+  priority: 1
+- name: Library calendars
+  access: fetch
+  priority: 2
+  interests:
+  - talks
+anchors: []
+recurring:
+- name: Grange contra dance
+  rule: second saturday
+  time: '19:30'
+  where: Grange Hall
+  city: Town Hall
+  interests:
+  - dance
+annual:
+- name: Fall foliage festival
+  months:
+  - 10
+  where: Stowe
+  interests:
+  - food
+fallbacks: []
+goals:
+  summary: Retired; happy to drive an hour for a good dance.
+  operating_rules:
+  - The drive is not a reason
+  prefer_recurring: true
+evaluation:
+  pick_threshold: 5.5
+  top_threshold: 7.5
+  criteria:
+  - id: interest
+    weight: 5
+  - id: distance
+    weight: 1
+  - id: venue
+    weight: 1
+  - id: price
+    weight: 1
+  - id: timing
+    weight: 1
+  hard_filters: []
+  caps: []
+  adjustments: []
+digest:
+  top_n: 3
+  max_lines: 40
+  include_anchors: true
+  include_recurring: true
+  include_fallbacks: true
+  include_coming_up: true
+  show_travel_times: true
+  push_prefix: 'Weekend picks:'
+knowledge_base: []
+permissions:
+  may_use_browser: true
+  may_read_calendar: false
+  require_approval:
+  - buy_tickets
+  - rsvp
+  - contact_person
+  - share_personal_data
+  - edit_knowledge_base
+  - make_commitment
+automation:
+  schedules: []
+  notify: only_on_picks
+  integrations:
+    knowledge_base: none
+    email: none
+    calendar: none
+    push: none
+    browser: none
+gaps: []
+changelog:
+- date: '2026-01-15'
+  change: Profile created and approved

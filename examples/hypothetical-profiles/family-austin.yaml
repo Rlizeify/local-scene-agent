@@ -1,0 +1,195 @@
+# Hypothetical profile: family-austin. A fictional person, for tests and as a worked example.
+schema_version: 1
+profile_status: approved
+approved_at: '2026-01-15T10:00:00'
+user:
+  id: rivera-family
+  name: Dana Rivera
+  timezone: America/Chicago
+  preferred_name: Dana
+  goes_with: family
+home:
+  base: Mueller, Austin
+  transport: car
+  max_drive_minutes: 40
+  areas:
+  - name: Home
+    places:
+    - Mueller
+    - Hyde Park
+    - Windsor Park
+    minutes: 10
+  - name: Central Austin
+    places:
+    - Downtown
+    - Zilker
+    - South Congress
+    - Austin
+    minutes: 20
+  - name: Suburbs
+    places:
+    - Round Rock
+    - Pflugerville
+    - Cedar Park
+    minutes: 35
+weekend:
+  starts:
+    day: saturday
+    time: 08:00
+  ends:
+    day: sunday
+    time: '18:00'
+  late_nights: false
+  earliest_start: 08:00
+constraints:
+  max_age_limit_ok: 0
+  kid_friendly_only: true
+budget:
+  currency: USD
+  comfortable_max: 15
+  hard_max: 40
+  free_bonus: true
+interests:
+- id: kids
+  label: Kid outings
+  weight: 5
+  daytime: true
+  keywords:
+  - storytime
+  - family day
+  - kids
+  - children's
+  - puppet
+  - petting zoo
+  - splash pad
+  - family-friendly
+- id: outdoors
+  label: Parks & nature
+  weight: 4
+  daytime: true
+  keywords:
+  - nature walk
+  - hike
+  - garden
+  - park
+  - bird
+  - nature center
+- id: markets
+  label: Farmers markets
+  weight: 3
+  daytime: true
+  keywords:
+  - farmers market
+  - market
+- id: music
+  label: Outdoor music (early)
+  weight: 2
+  keywords:
+  - concert in the park
+  - free concert
+  - outdoor concert
+avoid_keywords:
+- 21+
+- bar crawl
+- nightclub
+venues:
+- name: Thinkery
+  city: Mueller
+  area: Home
+  interests:
+  - kids
+  status: active
+- name: Zilker Botanical Garden
+  city: Zilker
+  area: Central Austin
+  interests:
+  - outdoors
+  status: active
+sources:
+- name: City parks & rec calendar
+  access: fetch
+  priority: 1
+  interests:
+  - kids
+  - outdoors
+- name: Library events
+  access: fetch
+  priority: 1
+  interests:
+  - kids
+- name: Local family events newsletter
+  access: search
+  priority: 2
+anchors: []
+recurring:
+- name: Saturday farmers market
+  rule: every saturday
+  time: 09:00
+  where: Mueller
+  interests:
+  - markets
+annual: []
+fallbacks:
+- name: Splash pad + playground
+  where: Mueller Lake Park
+goals:
+  summary: Two kids under 6. Mornings out, home for naps.
+  operating_rules:
+  - Done by 1pm on nap days
+  prefer_recurring: false
+evaluation:
+  pick_threshold: 6
+  top_threshold: 8
+  criteria:
+  - id: interest
+    weight: 4
+  - id: distance
+    weight: 2
+  - id: venue
+    weight: 1
+  - id: price
+    weight: 1
+  - id: timing
+    weight: 1
+  - id: novelty
+    weight: 1
+  hard_filters:
+  - field: start_hour
+    op: gte
+    value: 19
+    reason: after bedtime
+  caps: []
+  adjustments: []
+digest:
+  top_n: 3
+  max_lines: 40
+  include_anchors: true
+  include_recurring: true
+  include_fallbacks: true
+  include_coming_up: true
+  show_travel_times: true
+  push_prefix: 'Weekend picks:'
+knowledge_base: []
+permissions:
+  may_use_browser: true
+  may_read_calendar: false
+  require_approval:
+  - buy_tickets
+  - rsvp
+  - contact_person
+  - share_personal_data
+  - edit_knowledge_base
+  - make_commitment
+automation:
+  schedules: []
+  notify: only_on_picks
+  integrations:
+    knowledge_base: none
+    email: none
+    calendar: none
+    push: none
+    browser: none
+gaps: []
+changelog:
+- date: '2026-01-15'
+  change: Profile created and approved

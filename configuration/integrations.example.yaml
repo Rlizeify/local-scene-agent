@@ -1,0 +1,20 @@
+# Which optional integrations a profile uses. Copy the block into automation.integrations in your profile.
+# Credentials are never stored here: connectors are authorized inside your Claude app.
+automation:
+  notify: only_on_picks          # always | only_on_picks | never
+  integrations:
+    knowledge_base: notion       # notion | google_docs | none  (your own scene guide, read-only)
+    email: none                  # gmail | outlook | none        (e.g. reading venue newsletters, read-only)
+    calendar: none               # google | notion | outlook | none (clash checks; writes need approval)
+    push: claude_app             # claude_app | none
+    browser: built_in            # built_in | chrome | none
+  schedules:
+    - task: weekend-digest       # weekend-digest | tonight | month-ahead | log-check
+      when: "Fridays 2pm"
+      target: local              # local (desktop app scheduled task) | cloud (claude.ai routine)
+      enabled: true
+knowledge_base:
+  - type: notion
+    ref: 00000000-0000-0000-0000-000000000000   # the page id
+    title: My scene guide
+    use_for: [venues, sources, recurring, rules]

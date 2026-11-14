@@ -1,0 +1,181 @@
+# Hypothetical profile: sober-seattle-maker. A fictional person, for tests and as a worked example.
+schema_version: 1
+profile_status: approved
+approved_at: '2026-01-15T10:00:00'
+user:
+  id: ari
+  name: Ari Lindqvist
+  timezone: America/Los_Angeles
+home:
+  base: Ballard, Seattle
+  transport: bike
+  max_drive_minutes: 35
+  areas:
+  - name: Home
+    places:
+    - Ballard
+    - Fremont
+    - Phinney Ridge
+    minutes: 10
+  - name: Seattle
+    places:
+    - Capitol Hill
+    - Wallingford
+    - Downtown
+    - Seattle
+    minutes: 25
+weekend:
+  starts:
+    day: friday
+    time: '17:00'
+  ends:
+    day: sunday
+    time: '21:00'
+  late_nights: false
+constraints:
+  max_age_limit_ok: 21
+  alcohol_free_preferred: true
+budget:
+  currency: USD
+  comfortable_max: 30
+  hard_max: 80
+  free_bonus: true
+interests:
+- id: crafts
+  label: Classes & workshops
+  weight: 5
+  keywords:
+  - workshop
+  - class
+  - pottery
+  - printmaking
+  - sewing
+  - drop-in
+  - maker
+- id: games
+  label: Board games
+  weight: 4
+  keywords:
+  - board game
+  - game night
+  - tabletop
+  - d&d
+- id: art
+  label: Art walks
+  weight: 3
+  keywords:
+  - art walk
+  - art attack
+  - gallery
+  - open studio
+- id: music
+  label: All-ages shows
+  weight: 2
+  keywords:
+  - all ages
+  - acoustic
+  - folk
+  - indie
+avoid_keywords:
+- bar crawl
+- pub crawl
+- beer fest
+- wine tasting
+- bottomless
+venues: []
+sources:
+- name: Community center class calendars
+  access: fetch
+  priority: 1
+  interests:
+  - crafts
+- name: Game cafe calendars
+  access: fetch
+  priority: 1
+  interests:
+  - games
+- name: Neighborhood blog events
+  access: search
+  priority: 2
+anchors: []
+recurring:
+- name: Ballard art walk
+  rule: second saturday
+  time: '18:00'
+  where: Ballard
+  interests:
+  - art
+annual: []
+fallbacks: []
+goals:
+  summary: Sober; wants hands-on things and new friends.
+  operating_rules:
+  - Daytime and early evening
+  prefer_recurring: true
+evaluation:
+  pick_threshold: 6
+  top_threshold: 8
+  criteria:
+  - id: interest
+    weight: 4
+  - id: distance
+    weight: 2
+  - id: venue
+    weight: 1
+  - id: price
+    weight: 1
+  - id: timing
+    weight: 1
+  - id: novelty
+    weight: 1
+  - id: dry
+    label: Alcohol-free setting
+    weight: 1
+    positive_signals:
+    - alcohol-free
+    - sober
+    - cafe
+    - community center
+    - library
+    - all ages
+    negative_signals:
+    - bar
+    - brewery
+    - taproom
+    - 21+
+  hard_filters: []
+  caps: []
+  adjustments: []
+digest:
+  top_n: 3
+  max_lines: 40
+  include_anchors: true
+  include_recurring: true
+  include_fallbacks: true
+  include_coming_up: true
+  show_travel_times: true
+  push_prefix: 'Weekend picks:'
+knowledge_base: []
+permissions:
+  may_use_browser: true
+  may_read_calendar: false
+  require_approval:
+  - buy_tickets
+  - rsvp
+  - contact_person
+  - share_personal_data
+  - edit_knowledge_base
+  - make_commitment
+automation:
+  schedules: []
+  notify: only_on_picks
+  integrations:
+    knowledge_base: none
+    email: none
+    calendar: none
+    push: none
+    browser: none
+gaps: []
+changelog:
+- date: '2026-01-15'
+  change: Profile created and approved

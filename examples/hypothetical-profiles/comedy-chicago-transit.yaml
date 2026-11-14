@@ -1,0 +1,176 @@
+# Hypothetical profile: comedy-chicago-transit. A fictional person, for tests and as a worked example.
+schema_version: 1
+profile_status: approved
+approved_at: '2026-01-15T10:00:00'
+user:
+  id: jo
+  name: Jo Park
+  timezone: America/Chicago
+  goes_with: friends
+home:
+  base: Logan Square, Chicago
+  transport: transit
+  max_drive_minutes: 45
+  areas:
+  - name: Home
+    places:
+    - Logan Square
+    - Avondale
+    - Humboldt Park
+    minutes: 10
+  - name: North Side
+    places:
+    - Wicker Park
+    - Lincoln Park
+    - Lakeview
+    - Uptown
+    minutes: 25
+  - name: Downtown
+    places:
+    - Loop
+    - River North
+    - West Loop
+    - Chicago
+    minutes: 35
+  excluded_places:
+  - Suburbs
+weekend:
+  starts:
+    day: friday
+    time: '18:00'
+  ends:
+    day: sunday
+    time: '22:00'
+  late_nights: true
+constraints:
+  max_age_limit_ok: 21
+budget:
+  currency: USD
+  comfortable_max: 30
+  hard_max: 80
+  free_bonus: true
+interests:
+- id: comedy
+  label: Improv & stand-up
+  weight: 5
+  keywords:
+  - improv
+  - stand-up
+  - standup
+  - comedy
+  - sketch
+  - showcase
+  avoid_keywords:
+  - open mic
+  venues:
+  - The Annoyance
+  - iO
+- id: indie
+  label: Indie rock shows
+  weight: 4
+  keywords:
+  - indie
+  - indie rock
+  - shoegaze
+  - dream pop
+  - singer-songwriter
+  venues:
+  - Empty Bottle
+  - Thalia Hall
+- id: trivia
+  label: Trivia & games
+  weight: 2
+  keywords:
+  - trivia
+  - game night
+  - board game
+avoid_keywords: []
+venues:
+- name: The Annoyance
+  city: Lakeview
+  area: North Side
+  interests:
+  - comedy
+  status: active
+- name: Empty Bottle
+  city: Ukrainian Village
+  area: North Side
+  interests:
+  - indie
+  status: active
+sources:
+- name: Comedy theater calendars
+  access: fetch
+  priority: 1
+  interests:
+  - comedy
+- name: Alt-weekly music listings
+  access: search
+  priority: 1
+  interests:
+  - indie
+- name: Do312-style city guide
+  access: search
+  priority: 2
+anchors: []
+recurring: []
+annual: []
+fallbacks: []
+goals:
+  summary: Takes improv classes; wants to watch a lot of it.
+  operating_rules:
+  - Must be reachable by train
+  - Home by 1am
+  prefer_recurring: true
+evaluation:
+  pick_threshold: 6
+  top_threshold: 8
+  criteria:
+  - id: interest
+    weight: 4
+  - id: distance
+    weight: 2
+  - id: venue
+    weight: 1
+  - id: price
+    weight: 1
+  - id: timing
+    weight: 1
+  - id: novelty
+    weight: 1
+  hard_filters: []
+  caps: []
+  adjustments: []
+digest:
+  top_n: 3
+  max_lines: 40
+  include_anchors: true
+  include_recurring: true
+  include_fallbacks: true
+  include_coming_up: true
+  show_travel_times: true
+  push_prefix: 'Weekend picks:'
+knowledge_base: []
+permissions:
+  may_use_browser: true
+  may_read_calendar: false
+  require_approval:
+  - buy_tickets
+  - rsvp
+  - contact_person
+  - share_personal_data
+  - edit_knowledge_base
+  - make_commitment
+automation:
+  schedules: []
+  notify: only_on_picks
+  integrations:
+    knowledge_base: none
+    email: none
+    calendar: none
+    push: none
+    browser: none
+gaps: []
+changelog:
+- date: '2026-01-15'
+  change: Profile created and approved
