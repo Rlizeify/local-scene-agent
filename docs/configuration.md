@@ -90,7 +90,7 @@ avoid_themes:
 user:
   email: you@example.com         # local only
 automation:
-  email_digest: {enabled: true, to: self, subject_prefix: Weekend picks}
+  email_digest: {enabled: true, to: self, subject_prefix: Weekend picks, reply_to_add: true}
   calendar: {auto_add: true, which: top, title_prefix: "[Scene] ", only_verified: true, default_minutes: 120}
 ```
 Standing opt-ins: the digest email goes only to your own inbox; calendar entries go only on your own calendar, marked free, no guests, no duplicates.

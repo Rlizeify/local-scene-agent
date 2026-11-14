@@ -2,6 +2,10 @@
 
 All notable changes are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## 0.4.0 (2026-11-14)
+- **Reply to add:** with `automation.email_digest.reply_to_add`, the digest numbers its extra picks and ends with a CALENDAR OPTIONS block; the new `reply-handler` task (`lsa schedule routine reply-handler`) reads replies sent from the user's own address ("add 2 and 5", "remove the symphony"), updates their calendar, labels the reply, and confirms in-thread. Without it, the email says to ask /local-scene instead of promising replies.
+- Cloud briefs now carry each source's access mode and notes, so runs search instead of fetching sites known to block them.
+
 ## 0.3.0 (2026-11-14)
 - **Time is never a filter.** `weekend.latest_start` is replaced by `weekend.bedtime` (+ `late_penalty`): late starts and late endings rank lower with a heads-up. Standing plans with `start`/`end` flag clashes ("during Surfing: you'd leave early") and cost `conflict_penalty` (default 0.5) instead of hiding events; `anchors[].blocks` is removed. Recurring events carry heads-ups instead of disappearing. Migration: rename `latest_start` to `bedtime` and drop `blocks`.
 - **`avoid_themes`:** themes to skip that keywords can't catch, judged by Claude and carried into scheduled prompts.

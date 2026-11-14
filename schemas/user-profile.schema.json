@@ -941,7 +941,8 @@
                   "weekend-digest",
                   "tonight",
                   "month-ahead",
-                  "log-check"
+                  "log-check",
+                  "reply-handler"
                 ]
               },
               "when": {
@@ -1026,6 +1027,10 @@
             },
             "subject_prefix": {
               "type": "string"
+            },
+            "reply_to_add": {
+              "type": "boolean",
+              "description": "Replies to the digest ('add 2 and 5') get added to the calendar by the reply-handler routine."
             }
           },
           "description": "Scheduled runs email the full digest (not just 'task finished')."

@@ -135,3 +135,25 @@ def test_routine_body_is_ready_to_create(home):
     assert msg["role"] == "user" and "EMAIL" in msg["content"] and "lsa.py" not in msg["content"]
     assert set(body["_attach_connectors"]) == {"Gmail", "Google Calendar"}
     assert "WebSearch" in ccr["session_context"]["allowed_tools"]
+
+
+def test_reply_to_add(home):
+    uid = install_profile(EXAMPLE_PROFILE)
+    _with_automation(uid, email_digest={"enabled": True})
+    plain = schedule.render("weekend-digest", uid, "cloud")
+    assert "ask /local-scene" in plain and "CALENDAR OPTIONS" not in plain  # no promise of replies
+    _with_automation(uid, email_digest={"enabled": True, "reply_to_add": True}, calendar={"auto_add": True})
+    digest_prompt = schedule.render("weekend-digest", uid, "cloud")
+    assert "NUMBERED list" in digest_prompt and "CALENDAR OPTIONS" in digest_prompt and "add 2 and 5" in digest_prompt
+    handler = schedule.render("reply-handler", uid, "cloud")
+    assert "sent from maya@example.com" in handler and "[scene-bot]" in handler and "scene-handled" in handler
+    assert "Never touch any other event" in handler and "stop quietly" in handler
+    body = schedule.routine_body("reply-handler", uid, "CRON_TZ=America/Los_Angeles 15 6-20/2 * * 5,6,0", "env_x")
+    assert set(body["_attach_connectors"]) == {"Gmail", "Google Calendar"}
+
+
+def test_brief_carries_source_access(home):
+    uid = install_profile(EXAMPLE_PROFILE)
+    cloud = schedule.render("weekend-digest", uid, "cloud")
+    assert "Local alt-weekly events: everything [use web search; don't fetch]" in cloud
+    assert "[app/Instagram only" in cloud

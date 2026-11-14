@@ -28,7 +28,8 @@ Tasks: `weekend-digest`, `tonight`, `month-ahead`, `log-check`.
    - Get the environment id and the connectors' `connector_uuid`/`name`/`url` from the routines tool (an existing routine's `mcp_connections`, or the connector list). Add them to `mcp_connections`, add each connector's tools to `allowed_tools` (e.g. `mcp__Gmail__*`), drop the `_` keys, then create it.
    - If a needed connector isn't connected, tell them where to connect it rather than creating a routine that will fail.
 4. **Local scheduled task (computer on):** create it with the scheduled-task tool using `lsa schedule render weekend-digest --target local`.
-5. **Record it** in `automation.schedules[]` (`task`, `when`, `target`, `routine_id`) and offer one test run now, so they see the email and calendar entries before Friday.
+5. **Reply to add (optional):** if they want to reply to the email to add picks, set `automation.email_digest.reply_to_add: true`, re-render the digest routine, and create a second routine with `lsa schedule routine reply-handler --cron 'CRON_TZ=<zone> 15 6-20/2 * * 5,6,0'` (Gmail + Google Calendar only).
+6. **Record it** in `automation.schedules[]` (`task`, `when`, `target`, `routine_id`) and offer one test run now, so they see the email and calendar entries before Friday.
 
 ## Rules baked into every prompt
 Read/research/report only: no tickets, RSVPs, messages to anyone, sign-ups, guide edits or personal data. The only exceptions are the user's own digest email and their own calendar, and only when they switched those on. Time never removes an event. Verify dates; label unverified items; don't retry refused fetches; say when a tool is missing.

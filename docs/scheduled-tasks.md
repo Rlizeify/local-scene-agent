@@ -7,6 +7,7 @@
 | `tonight` | Tonight only | Weekdays ~4pm, if wanted |
 | `month-ahead` | Annual festivals, big shows and on-sale dates for the next 5 weeks | First of the month |
 | `log-check` | Lists last weekend's picks so you can record what you did | Monday morning |
+| `reply-handler` | Reads your replies to the digest ("add 2 and 5", "remove the symphony"), updates your calendar, replies to confirm | Every 2 hours Fri–Sun, e.g. `CRON_TZ=<zone> 15 6-20/2 * * 5,6,0` |
 
 Render a prompt, or a ready-to-create cloud routine:
 ```bash
@@ -21,6 +22,7 @@ lsa --user <id> schedule routine weekend-digest --cron 'CRON_TZ=America/New_York
 - **An email with the whole digest** (optional, `automation.email_digest`): sent to your own inbox only. It opens with what was added to your calendar and "Want any of these on your calendar too?".
 - **Calendar entries** (optional, `automation.calendar`): Top picks (or all picks) added to your own calendar, marked free, no guests, no duplicates, labeled so you can delete what you skip.
 - **One push notification** (optional).
+- **Reply to add** (optional, `automation.email_digest.reply_to_add` + a `reply-handler` routine): the "want these too?" picks are numbered, and the email ends with a short CALENDAR OPTIONS list. Reply "add 2 and 5" and the reply handler puts them on your calendar and replies "[scene-bot] Added: ...". It only acts on replies sent from your own address, only adds or removes the digest's own `[Scene]` entries, and only replies to you.
 
 ## Two targets, honestly compared
 | | `local`: Claude desktop app scheduled task | `cloud`: claude.ai routine |
