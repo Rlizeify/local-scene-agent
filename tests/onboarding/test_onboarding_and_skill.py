@@ -97,5 +97,6 @@ def test_schedule_prompts(home):
     assert cloud.index("1. Live jazz") < cloud.index("2. Punk")
     assert "Closed, skip: Old Warehouse Bar" in cloud
     assert "PushNotification" in cloud  # push is configured in the example
+    assert "Friday 17:00 to Sunday 22:00" in cloud  # the profile's own weekend, not a hardcoded one
     for task in schedule.TASKS:
         assert schedule.render(task, uid, "local") and schedule.render(task, uid, "cloud")

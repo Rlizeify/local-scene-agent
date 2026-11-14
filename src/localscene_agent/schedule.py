@@ -65,6 +65,8 @@ def brief(prof: dict) -> str:
             s += f". Artists: {', '.join(i['artists'][:6])}"
         if i.get("avoid_keywords"):
             s += f". Not: {', '.join(i['avoid_keywords'])}"
+        if i.get("notes"):
+            s += f". Note: {i['notes']}"
         lines.append(s)
     if prof.get("avoid_keywords"):
         lines.append(f"- Never suggest anything mentioning: {', '.join(prof['avoid_keywords'])}")
@@ -74,7 +76,8 @@ def brief(prof: dict) -> str:
     anchors = prof.get("anchors", [])
     if anchors:
         lines += ["", "STANDING PLANS (always list)"] + [
-            f"- {a['label']}" + (f", {a['day'].title()}" if a.get("day") else "") + (f" {a['time']}" if a.get("time") else "")
+            f"- {a['label']}" + (f", {a['day'].title()}" if a.get("day") else "")
+            + (f" {a['start']}-{a['end']}" if a.get("start") and a.get("end") else f" {a['time']}" if a.get("time") else "")
             + (f" at {a['where']}" if a.get("where") else "") for a in anchors]
     rec = prof.get("recurring", [])
     if rec:
@@ -92,9 +95,21 @@ def brief(prof: dict) -> str:
                          "(load it via ToolSearch if deferred). Use it as the source list and taste guide. Do not edit it.")
         else:
             lines.append(f"- Read their guide: {k.get('title') or k['ref']} ({k['ref']}). Do not edit it.")
-    for s in sorted([s for s in prof["sources"] if s.get("enabled", True)], key=lambda s: s.get("priority", 2))[:25]:
+    rank = {i["id"]: n for n, i in enumerate(profile_mod.ranked_interests(prof))}
+
+    def order(s):  # priority first, then the best-ranked interest the source covers
+        return s.get("priority", 2), min((rank.get(i, 99) for i in s.get("interests", [])), default=50)
+
+    for s in sorted([s for s in prof["sources"] if s.get("enabled", True)], key=order)[:25]:
         lines.append(f"- {s['name']}" + (f" ({s['url']})" if s.get("url") else "") + (f": {s['covers']}" if s.get("covers") else ""))
     return "\n".join(lines)
+
+
+def _window_text(prof: dict) -> str:
+    wk = prof.get("weekend", {})
+    st, en = wk.get("starts", {}), wk.get("ends", {})
+    return (f"{st.get('day', 'friday').title()} {st.get('time', '17:00')} to "
+            f"{en.get('day', 'sunday').title()} {en.get('time', '23:59')}")
 
 
 def _output_block(prof: dict, task: str) -> str:
@@ -132,7 +147,7 @@ def render(task: str, user_id: str, target: str = "local") -> str:
 
     if target == "cloud":
         steps = {
-            "weekend-digest": "STEPS\n1. Work out this Friday-to-Sunday window from today's date.\n"
+            "weekend-digest": f"STEPS\n1. Work out this weekend's window from today's date: {_window_text(prof)}.\n"
                               "2. Read the guide (if listed), then cover the sources and run targeted web searches "
                               "(venue + date) in parallel, weighted toward the top interests.\n"
                               "3. Drop anything outside the window, in an excluded place, or at a closed venue. Rank by fit.",
