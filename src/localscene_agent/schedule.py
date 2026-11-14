@@ -234,8 +234,8 @@ STEPS
    create it on the primary calendar: title "{prefix}<event> @ <venue>" (add "(unverified)" before the event name if the line
    says unverified), the listed start and end (or {mins} minutes), location, description with the link and "Added from your
    reply. Delete it if you're not going.", shown as free, no guests, no invitations.
-   REMOVE: only delete events whose title starts with "{prefix}" and whose description says it was added by the digest or a
-   reply. Never touch any other event.
+   REMOVE: only delete events whose title starts with "{prefix}" and whose description contains "Delete it if you're not
+   going." (every entry this agent creates carries that line). Never touch any other event.
 5. Reply once in the same thread, to {me} only, starting with "[scene-bot]": what you added (with times), what you removed,
    what was already there, and anything you weren't sure about.
 6. Label each request you handled "scene-handled" (create the label if it doesn't exist). That label is the only other change
